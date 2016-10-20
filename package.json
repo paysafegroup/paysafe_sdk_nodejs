@@ -1,0 +1,31 @@
+{
+  "name": "NodePaysafeSDK",
+  "version": "1.0",
+  "description": "Nodejs SDK for Paysafe",
+  "main": "./lib/PaysafeApiClient.js",
+  "scripts": {
+    "test": "echo No test to execute."
+  },
+  "contributors": [
+                   { "name": "Anup Warke", "email": "anup.w@opussoft.com" },
+                   { "name": "Atul Patil", "email": "atul.patil@opussoft.com" },
+                   { "name": "Girish Ahirrao", "email": "Girish.Ahirrao@opussoft.com" }
+                 ],
+  "repository": "",
+  "dependencies": {
+    "request": "^2.53.0"
+  },
+  "devDependencies": {
+  	"nodeunit": "^0.9.0",
+  	"express": "4.12.3"
+  },
+  "keywords": [
+    "NodePaysafeSDK",
+    "node.js",
+    "eclipse",
+    "nodeclipse"
+  ],
+  "author": "Opus Softwares Pvt. Ltd.",
+  "license": "",
+  "readmeFilename": "README.md"
+}
