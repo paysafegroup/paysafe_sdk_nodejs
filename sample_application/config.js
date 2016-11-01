@@ -9,5 +9,5 @@ exports.paysafeAccountNumber = 'your-account-number';
 exports.paysafeEnvironment = 'TEST';// TEST or LIVE
 
 
-exports.currency_code = 'currecy-code';
+exports.currency_code = 'currency-code';
 exports.currency_base_units_multiplier = 100;

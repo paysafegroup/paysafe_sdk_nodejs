@@ -257,7 +257,7 @@ exports.submitEnrollmentLookup = function(req, res){
 	var cardexpiry = new PaysafeApiClient.CardExpiry();
 	enrollment.setmerchantRefNum(merchantRefNumber);
 	enrollment.setamount(5000);
-	enrollment.setcurrency("USD");
+	enrollment.setcurrency(config.currency_code);
 	enrollment.setcustomerIp("172.0.0.1");
 	enrollment.setuserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36");
 	enrollment.setacceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
