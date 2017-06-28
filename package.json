@@ -1,6 +1,6 @@
 {
   "name": "NodePaysafeSDK",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Nodejs SDK for Paysafe",
   "main": "./lib/PaysafeApiClient.js",
   "scripts": {
