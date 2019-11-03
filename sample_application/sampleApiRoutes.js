@@ -2,11 +2,6 @@
  * GET users listing.
  */
 var PaysafeApiClient = require("../lib/PaysafeApiClient");
-var PaysafeApiClient = require("../lib/PaysafeApiClient");
-var PaysafeApiClient = require("../lib/PaysafeApiClient");
-var PaysafeApiClient = require("../lib/PaysafeApiClient");
-var PaysafeApiClient = require("../lib/PaysafeApiClient");
-var PaysafeApiClient = require("../lib/PaysafeApiClient");
 var config = require("./config");
 
 //var PaysafeApiClient;
