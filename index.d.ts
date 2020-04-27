@@ -1,10 +1,11 @@
-import { HeaderOptions, IResponseFn, StripeResource, usageRecordSummaries } from 'stripe'
-
 declare class Paysafe {
-  resources: typeof Paysafe.resources;
-  PaysafeResource: typeof Paysafe.PaysafeResource;
+  // resources: typeof Paysafe.resources
+  // PaysafeResource: typeof Paysafe.PaysafeResource
 
   constructor(apiKey: string, apiPassword: string, environment: string, accountNumber: string | boolean);
+
+  getConstant(c: string): any
+
 }
 export = Paysafe;
 
@@ -84,13 +85,15 @@ declare namespace Paysafe {
     }
   }
 
-  class PaysafeResource {
-    constructor(paysafe: Paysafe);
-  }
-
-  namespace resources {
-    class MerchantServiceHandler extends PaysafeResource {
-      createMerchant(data: merchants.IMerchant): merchants.IMerchant
-    }
-  }
+  // class PaysafeResource {
+  //   constructor(paysafe: Paysafe);
+  // }
+  //
+  // namespace resources {
+  //   class MerchantServiceHandler extends PaysafeResource {
+  //     constructor(paysafe: any)
+  //
+  //     createMerchant(data: merchants.IMerchant): merchants.IMerchant
+  //   }
+  // }
 }
