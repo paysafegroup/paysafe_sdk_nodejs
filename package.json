@@ -1,5 +1,5 @@
 {
-  "_from": "github:paysafegroup/paysafe_sdk_nodejs",
+  "_from": "github:patientpal/paysafe_sdk_nodejs",
   "_id": "NodePaysafeSDK@1.0.0",
   "_inBundle": false,
   "_integrity": "",
@@ -7,18 +7,19 @@
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "paysafegroup/paysafe_sdk_nodejs",
-    "rawSpec": "paysafegroup/paysafe_sdk_nodejs",
-    "saveSpec": "github:paysafegroup/paysafe_sdk_nodejs",
+    "raw": "NodePaysafeSDK@github:patientpal/paysafe_sdk_nodejs",
+    "name": "NodePaysafeSDK",
+    "escapedName": "NodePaysafeSDK",
+    "rawSpec": "github:patientpal/paysafe_sdk_nodejs",
+    "saveSpec": "github:patientpal/paysafe_sdk_nodejs",
     "fetchSpec": null,
     "gitCommittish": null
   },
   "_requiredBy": [
-    "#USER",
     "/"
   ],
-  "_resolved": "github:paysafegroup/paysafe_sdk_nodejs#7103c3ff61d97e31e5d98e973d9eef835e98430a",
-  "_spec": "paysafegroup/paysafe_sdk_nodejs",
+  "_resolved": "github:patientpal/paysafe_sdk_nodejs#ec663a171652e62e28c14a418f5a09f288a29164",
+  "_spec": "NodePaysafeSDK@github:patientpal/paysafe_sdk_nodejs",
   "_where": "/Users/franciscobueno/WebstormProjects/backend",
   "author": {
     "name": "Opus Softwares Pvt. Ltd."
@@ -47,9 +48,6 @@
     "express": "4.12.3",
     "nodeunit": "^0.9.0"
   },
-  "files": [
-    "index.d.ts"
-  ],
   "keywords": [
     "NodePaysafeSDK",
     "node.js",
