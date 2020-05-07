@@ -1,3 +1,5 @@
+import { PaymentChargeService } from '../../src/services/payment/payment-charge.service'
+
 declare class Paysafe {
   // resources: typeof Paysafe.resources
   // PaysafeResource: typeof Paysafe.PaysafeResource
@@ -11,12 +13,90 @@ export = Paysafe;
 
 declare namespace Paysafe {
 
+  namespace customers {
+    interface ICustomer {
+      id: string,
+      status: string,
+      merchantCustomerId: string,
+      locale: string,
+      firstName: string,
+      middleName: string,
+      lastName: string,
+      email: string,
+      phone: string,
+      dateOfBirth: common.IDateOfBirth
+      paymentToken: string,
+      error?: any,
+    }
+
+    interface IAddress {
+      id: string,
+      street: string
+      street2: string
+      street3?: string
+      city: string
+      country: string
+      state: string
+      zip: string
+      phone: string
+      status: string
+      recipientName: string
+      profile: ICustomer
+      error?: common.IError
+    }
+
+    interface ICard {
+      id: string
+      lastDigits: string
+      cvv: string
+      type: string
+      paymentToken: string
+      cardType?: 'AX' | 'BC' | 'BL' | 'CB' | 'DN' | 'DS' | 'EC' | 'JC' | 'MA' | 'MC' | 'SO' | 'CU' | 'TP' | 'VE' | 'VI' | 'Unknown',
+      cardExpiry: ICardExpiry
+      holderName: string
+      billingAddressId: string
+      defaultCardIndicator: boolean
+      status: string
+      error?: common.IError,
+    }
+
+    interface ICardExpiry {
+      month: number
+      year: number
+    }
+
+    interface IAuthorization {
+      id: string
+      merchantRefNum: string
+      amount: number
+      card: ICard
+      settleWithAuth: boolean
+      description?: string
+      currencyCode?: string
+      status?: string
+      error?: common.IError
+    }
+
+    interface IRefund {
+      id: string
+      amount: number
+      merchantRefNum: string
+      settlements: ISettlements
+      status?: string
+      error?: common.IError
+    }
+
+    interface ISettlements {
+      id: string
+      error?: common.IError
+    }
+  }
   namespace merchants {
     interface IMerchant {
       id: string
       name: string  // Required
       links: common.ILink[]
-      error: common.IError
+      error?: common.IError
     }
     interface IMerchantAccount {
       id: string
@@ -44,7 +124,7 @@ declare namespace Paysafe {
       password: string
       recoveryQuestion: IRecoveryQuestion
       links: common.ILink[]
-      error: common.IError
+      error?: common.IError
     }
 
     interface IRecoveryQuestion {
@@ -52,7 +132,7 @@ declare namespace Paysafe {
       question: string
       questionId: string
       answer: string
-      error: common.IError
+      error?: common.IError
     }
 
     interface IUsAccountDetails {
@@ -73,6 +153,11 @@ declare namespace Paysafe {
   }
 
   namespace common {
+    interface IDateOfBirth {
+      year: string
+      month: string
+      day: string
+    }
     interface IError {
       code: string
       message: string
