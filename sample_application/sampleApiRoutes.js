@@ -81,7 +81,7 @@ exports.createProfile = function(req, res) {
 	profile.setEmail("anna.perry" + merchantRefNumber + "@cya.com");
 	profile.setPhone("713-444-5555");
 	PaysafeApiClient.CustomerServiceHandler(PaysafeApiClient)
-			.createCustmerProfile(profile, function(error, response) {
+			.createCustomerProfile(profile, function(error, response) {
 				if (error) {
 					res.send(JSON.stringify(error));
 				} else {
@@ -114,7 +114,7 @@ exports.createCard = function(req, res) {
 	address.setRecipientName("Jane Doe " + merchantRefNumber);
 	address.setProfile(profile);
 	PaysafeApiClient.CustomerServiceHandler(PaysafeApiClient)
-			.createCustmerAddress(
+			.createCustomerAddress(
 					address,
 					function(error, response) {
 						if (error) {
@@ -123,7 +123,7 @@ exports.createCard = function(req, res) {
 							// this is for avs zip error remove
 							card.setBillingAddressId(response.id);
 							PaysafeApiClient.CustomerServiceHandler(PaysafeApiClient)
-									.createCustmerCard(card, function(error, response) {
+									.createCustomerCard(card, function(error, response) {
 										if (error) {
 											res.send(JSON.stringify(error));
 										} else {
@@ -149,7 +149,7 @@ exports.createAddress = function(req, res) {
 	profile.setId(json.profileId);
 	address.setProfile(profile);
 	PaysafeApiClient.CustomerServiceHandler(PaysafeApiClient)
-	.createCustmerAddress(address, function(error, resCreateAdd) {
+	.createCustomerAddress(address, function(error, resCreateAdd) {
 		//console.log(resCreateAdd);
 		if (error) {
 			res.send(JSON.stringify(error));

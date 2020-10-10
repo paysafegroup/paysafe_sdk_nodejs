@@ -1,5 +1,3 @@
-import { IStripeError } from 'stripe'
-
 declare class Paysafe {
   constructor(apiKey: string, apiPassword: string, environment: string, accountNumber: string | boolean);
 
@@ -76,6 +74,7 @@ declare namespace Paysafe {
     }
   }
   namespace merchants {
+    type MerchantAccountStatus = 'APPROVED' | 'PROCESSING' | 'DEFERRED' | 'DISABLED' | 'ENABLED' | 'PENDING' | 'REJECTED' | 'RETURNED' | 'SUBMITTED' | 'WAITING' | 'WITHDRAWN'
     interface IMerchant {
       id: string
       name: string  // Required
@@ -95,7 +94,7 @@ declare namespace Paysafe {
       phone: string  // Required
       usAccountDetails: IUsAccountDetails
       merchantDescriptor: IMerchantDescriptor
-      status: string
+      status: MerchantAccountStatus
       name: string
       links: common.ILink[]
       error: common.IError
@@ -284,13 +283,13 @@ declare namespace Paysafe {
     }
 
     class Customer extends PaysafeResource {
-      getCustmerProfile(data: customers.ICustomer, response?: IResponseFn<customers.ICustomer>): Promise<customers.ICustomer>;
-      createCustmerProfile(data: customers.ICustomer, response?: IResponseFn<customers.ICustomer>): Promise<customers.ICustomer>;
-      updateCustmerProfile(data: customers.ICustomer, response?: IResponseFn<customers.ICustomer>): Promise<customers.ICustomer>;
-      createCustmerAddress(data: common.IAddress, response?: IResponseFn<common.IAddress>): Promise<common.IAddress>;
-      updateCustmerAddress(data: common.IAddress, response?: IResponseFn<common.IAddress>): Promise<common.IAddress>;
-      getCustmerCard(data: cards.ICard, response?: IResponseFn<cards.ICard>): Promise<cards.ICard>;
-      createCustmerCard(data: cards.ICard, response?: IResponseFn<cards.ICard>): Promise<cards.ICard>;
+      getCustomerProfile(data: customers.ICustomer, response?: IResponseFn<customers.ICustomer>): Promise<customers.ICustomer>;
+      createCustomerProfile(data: customers.ICustomer, response?: IResponseFn<customers.ICustomer>): Promise<customers.ICustomer>;
+      updateCustomerProfile(data: customers.ICustomer, response?: IResponseFn<customers.ICustomer>): Promise<customers.ICustomer>;
+      createCustomerAddress(data: common.IAddress, response?: IResponseFn<common.IAddress>): Promise<common.IAddress>;
+      updateCustomerAddress(data: common.IAddress, response?: IResponseFn<common.IAddress>): Promise<common.IAddress>;
+      getCustomerCard(data: cards.ICard, response?: IResponseFn<cards.ICard>): Promise<cards.ICard>;
+      createCustomerCard(data: cards.ICard, response?: IResponseFn<cards.ICard>): Promise<cards.ICard>;
 
     }
 
