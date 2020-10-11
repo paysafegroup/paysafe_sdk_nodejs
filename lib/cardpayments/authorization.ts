@@ -1,6 +1,6 @@
 import { MerchantDescriptor } from '../account/merchantDescriptor'
 import { Profile } from '../customervault/profile'
-import { GenericLinkedObject } from '../generic-linked-object'
+import { GenericLinkedObject, IGenericLinkedObject } from '../generic-linked-object'
 import { AccordD } from './accordD'
 import { AcquirerResponse } from './acquirerResponse'
 import { Authentication } from './authentication'
@@ -11,7 +11,44 @@ import { Settlement } from './settlement'
 import { ShippingDetails } from './shippingDetails'
 import { VisaAdditionalAuthData } from './visaAdditionalAuthData'
 
-export class Authorization extends GenericLinkedObject {
+export type Recurring = 'INITIAL' | 'RECURRING'
+export type AVSResponse = 'MATCH' | 'MATCH_ADDRESS_ONLY' | 'MATCH_ZIP_ONLY' | 'NO_MATCH' | 'NOT_PROCESSED' | 'UNKNOWN'
+export type CvvVerification = 'MATCH' | 'NO_MATCH' | 'NOT_PROCESSED' | 'UNKNOWN'
+export type AuthorizationStatus = 'RECEIVED' | 'COMPLETED' | 'HELD' | 'FAILED' | 'CANCELLED'
+
+export interface IAuthorization extends IGenericLinkedObject {
+  merchantRefNum?: string
+  amount?: number
+  settleWithAuth?: boolean
+  availableToSettle?: number
+  childAccountNum?: string
+  card?: Card
+  authentication?: Authentication
+  authCode?: string
+  profile?: Profile
+  billingDetails?: BillingDetails
+  shippingDetails?: ShippingDetails
+  recurring?: Recurring
+  customerIp?: string
+  dupCheck?: boolean
+  keywords?: string[]
+  merchantDescriptor?: MerchantDescriptor
+  accordD?: AccordD
+  description?: string
+  masterPass?: MasterPass
+  txnTime?: string // Date
+  currencyCode?: string
+  avsResponse?: AVSResponse
+  cvvVerification?: CvvVerification
+  status?: AuthorizationStatus
+  riskReasonCode?: number[]
+  acquirerResponse?: AcquirerResponse
+  visaAdditionalAuthData?: VisaAdditionalAuthData
+  auths?: Authorization[]
+  settlements?: Settlement[]
+}
+
+export class Authorization extends GenericLinkedObject implements IAuthorization {
   merchantRefNum: string
   amount: number
   settleWithAuth: boolean
@@ -23,7 +60,7 @@ export class Authorization extends GenericLinkedObject {
   profile: Profile
   billingDetails: BillingDetails
   shippingDetails: ShippingDetails
-  recurring?: 'INITIAL' | 'RECURRING'
+  recurring?: Recurring
   customerIp: string
   dupCheck: boolean
   keywords: string[]
@@ -33,16 +70,16 @@ export class Authorization extends GenericLinkedObject {
   masterPass: MasterPass
   txnTime: string // Date
   currencyCode: string
-  avsResponse: 'MATCH' | 'MATCH_ADDRESS_ONLY' | 'MATCH_ZIP_ONLY' | 'NO_MATCH' | 'NOT_PROCESSED' | 'UNKNOWN'
-  cvvVerification: 'MATCH' | 'NO_MATCH' | 'NOT_PROCESSED' | 'UNKNOWN'
-  status: 'RECEIVED' | 'COMPLETED' | 'HELD' | 'FAILED' | 'CANCELLED'
+  avsResponse: AVSResponse
+  cvvVerification: CvvVerification
+  status: AuthorizationStatus
   riskReasonCode: number[]
   acquirerResponse: AcquirerResponse
   visaAdditionalAuthData?: VisaAdditionalAuthData
   auths: Authorization[]
   settlements: Settlement[]
 
-  constructor(resp) {
+  constructor(resp?: IAuthorization) {
     super(resp)
 
     if (resp) {
@@ -186,7 +223,7 @@ export class Authorization extends GenericLinkedObject {
     return this.riskReasonCode
   }
 
-  setCvvVerification(cvvVerification) {
+  setCvvVerification(cvvVerification: CvvVerification) {
     this.cvvVerification = cvvVerification
   }
 
@@ -194,9 +231,10 @@ export class Authorization extends GenericLinkedObject {
     return this.cvvVerification
   }
 
-  setAvsResponse(avsResponse) {
+  setAvsResponse(avsResponse: AVSResponse) {
     this.avsResponse = avsResponse
   }
+
   getAvsResponse() {
     return this.avsResponse
   }
@@ -271,9 +309,10 @@ export class Authorization extends GenericLinkedObject {
     return this.dupCheck
   }
 
-  setRecurring(recurring) {
+  setRecurring(recurring: Recurring) {
     this.recurring = recurring
   }
+
   getRecurring() {
     return this.recurring
   }
@@ -338,7 +377,7 @@ export class Authorization extends GenericLinkedObject {
     return this.settleWithAuth
   }
 
-  setAmount(amount) {
+  setAmount(amount: number) {
     this.amount = amount
   }
 
@@ -346,14 +385,15 @@ export class Authorization extends GenericLinkedObject {
     return this.amount
   }
 
-  setMerchantRefNum(merchantRefNum) {
+  setMerchantRefNum(merchantRefNum: string) {
     this.merchantRefNum = merchantRefNum
   }
+
   getMerchantRefNum() {
     return this.merchantRefNum
   }
 
-  setStatus(status) {
+  setStatus(status: AuthorizationStatus) {
     this.status = status
   }
 

@@ -2,6 +2,8 @@ import { GenericLinkedObject } from '../generic-linked-object'
 import { AcquirerResponse } from './acquirerResponse'
 import { Settlement } from './settlement'
 
+export type RefundStatus = 'RECEIVED' | 'COMPLETED' | 'PENDING' | 'FAILED' | 'CANCELLED'
+
 export class Refund extends GenericLinkedObject {
   merchantRefNum: string
 
@@ -13,7 +15,7 @@ export class Refund extends GenericLinkedObject {
    * FAILED – The transaction failed, due to either an error or being declined.
    * CANCELLED – The request has been fully voided (reversed).
    */
-  status: 'RECEIVED' | 'COMPLETED' | 'PENDING' | 'FAILED' | 'CANCELLED'
+  status?: RefundStatus
 
   amount: number
   childAccountNum: string
@@ -29,7 +31,7 @@ export class Refund extends GenericLinkedObject {
   authType: string
   confirmationNumber: string
 
-  constructor(resp) {
+  constructor(resp?: any) {
     super(resp)
 
     if (resp) {
@@ -121,7 +123,7 @@ export class Refund extends GenericLinkedObject {
     return this.currencyCode
   }
 
-  setRefunds(refunds) {
+  setRefunds(refunds: Refund[]) {
     this.refunds = refunds
   }
 
@@ -129,7 +131,7 @@ export class Refund extends GenericLinkedObject {
     return this.refunds
   }
 
-  setStatus(status) {
+  setStatus(status: RefundStatus) {
     this.status = status
   }
 

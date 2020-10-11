@@ -1,4 +1,15 @@
-export class BillingDetails {
+export interface IBillingDetails {
+  street?: string
+  street2?: string
+  city?: string
+  state?: string
+  country?: string
+  zip?: string
+  phone?: string
+  useAsShippingAddress?: boolean
+}
+
+export class BillingDetails implements IBillingDetails {
   street: string
   street2: string
   city: string
@@ -8,7 +19,7 @@ export class BillingDetails {
   phone: string
   useAsShippingAddress: boolean
 
-  constructor(resp) {
+  constructor(resp?: IBillingDetails) {
     if (resp) {
       if (resp.street) {
         this.street = resp.street

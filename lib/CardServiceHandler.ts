@@ -42,7 +42,7 @@ export class CardServiceHandler extends GenericServiceHandler {
    */
   async authorize(auth: Authorization): Promise<Authorization> {
     const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH, this.api.accountNumber), constants.POST)
-    const response = this.request(requestObj, auth)
+    const response = await this.request(requestObj, auth)
     return new Authorization(response)
   }
 
@@ -56,7 +56,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       auth.status = 'COMPLETED'
       const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
         constants.PUT)
-      const response = this.request(requestObj, auth)
+      const response = await this.request(requestObj, auth)
       return new Authorization(response)
     } else {
       throw this.exception('Auth id is missing in CardServiceHandler.approveHeldAuth')
@@ -73,7 +73,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       auth.status = 'CANCELLED'
       const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
         constants.PUT)
-      const response = this.request(requestObj, auth)
+      const response = await this.request(requestObj, auth)
       return new Authorization(response)
     } else {
       throw this.exception('Auth id is missing in CardServiceHandler.cancelHeldAuth')
@@ -90,7 +90,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       delete authReversal.authorization
       const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId + REVERSAUTH, this.api.accountNumber),
         constants.POST)
-      const response = this.request(requestObj, authReversal)
+      const response = await this.request(requestObj, authReversal)
       return new AuthorizationReversal(response)
     } else {
       throw this.exception('auth id is missing in CardServiceHandler.reverseAuth')
@@ -106,7 +106,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       delete settle.authorization
       const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId + SETTLEMENTS, this.api.accountNumber),
         constants.POST)
-      const response = this.request(requestObj, settle)
+      const response = await this.request(requestObj, settle)
       return new Settlement(response)
     } else {
       throw this.exception('Auth id is missing in CardServiceHandler.settlement')
@@ -123,7 +123,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       settle.status = 'CANCELLED'
       const requestObj = new PaysafeMethod(prepareURI(SETTLEMENTS + '/' + settlementId, this.api.accountNumber),
         constants.PUT)
-      const response = this.request(requestObj, settle)
+      const response = await this.request(requestObj, settle)
       return new Settlement(response)
     } else {
       throw this.exception('settlement id is missing in CardServiceHandler.cancelSettlement')
@@ -140,7 +140,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       delete refund.settlements
       const requestObj = new PaysafeMethod(prepareURI(SETTLEMENTS + '/' + settleId + REFUNDS, this.api.accountNumber),
         constants.POST)
-      const response = this.request(requestObj, refund)
+      const response = await this.request(requestObj, refund)
       return new Refund(response)
     } else {
       throw this.exception('settlement id is missing in CardServiceHandler.refund')
@@ -157,7 +157,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       refund.status = 'CANCELLED'
       const requestObj = new PaysafeMethod(prepareURI(REFUNDS + '/' + refundId, this.api.accountNumber),
         constants.PUT)
-      const response = this.request(requestObj, refund)
+      const response = await this.request(requestObj, refund)
       return new Refund(response)
     } else {
       throw this.exception('settlement id is missing in CardServiceHandler.cancelRefund')
@@ -173,7 +173,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       delete auth.id
       const PaysafeRequestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
         constants.GET)
-      const response = this.request(PaysafeRequestObj, null)
+      const response = await this.request(PaysafeRequestObj, null)
       return new Authorization(response)
     } else {
       throw this.exception('Auth id is missing in CardServiceHandler.getAuth')
@@ -189,7 +189,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       delete authReversal.id
       const requestObj = new PaysafeMethod(prepareURI(REVERSAUTH + authId, this.api.accountNumber),
         constants.GET)
-      const response = this.request(requestObj, null)
+      const response = await this.request(requestObj, null)
       return new AuthorizationReversal(response)
     } else {
       throw this.exception('Reverse Auth id is missing in CardServiceHandler.getAuthReversal')
@@ -236,7 +236,7 @@ export class CardServiceHandler extends GenericServiceHandler {
         const toInclude = this.searchMerchantRefCommon(classObj, pagination)
         const requestObj = new PaysafeMethod(prepareURI(upperClassName + '?' + toInclude, this.api.accountNumber),
           constants.GET)
-        const response = this.request(requestObj, null)
+        const response = await this.request(requestObj, null)
         return new constructor(response)
       } else {
         throw this.exception('Please provide valid class name for search')
@@ -255,7 +255,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       delete settle.id
       const requestObj = new PaysafeMethod(prepareURI(SETTLEMENTS + '/' + settlementId, this.api.accountNumber),
         constants.GET)
-      const response = this.request(requestObj, null)
+      const response = await this.request(requestObj, null)
       return new Settlement(response)
     } else {
       throw this.exception('settlement id is missing in CardServiceHandler.getSettlement')
@@ -271,7 +271,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       delete refund.id
       const requestObj = new PaysafeMethod(prepareURI(REFUNDS + '/' + refundId, this.api.accountNumber),
         constants.GET)
-      const response = this.request(requestObj, null)
+      const response = await this.request(requestObj, null)
       return new Refund(response)
     } else {
       throw this.exception('refund id is missing in CardServiceHandler.getRefund')
@@ -283,7 +283,7 @@ export class CardServiceHandler extends GenericServiceHandler {
    */
   async verify(verification: Verification): Promise<Verification> {
     const requestObj = new PaysafeMethod(prepareURI(VERIFICATION, this.api.accountNumber), constants.POST)
-    const response = this.request(requestObj, verification)
+    const response = await this.request(requestObj, verification)
     return new Verification(response)
   }
 
@@ -296,7 +296,7 @@ export class CardServiceHandler extends GenericServiceHandler {
       delete verification.id
       const requestObj = new PaysafeMethod(prepareURI(VERIFICATION + '/' + verificationId, this.api.accountNumber),
         constants.GET)
-      const response = this.request(requestObj, null)
+      const response = await this.request(requestObj, null)
       return new Verification(response)
     } else {
       throw this.exception('verification id is missing in CardServiceHandler.getVerification')

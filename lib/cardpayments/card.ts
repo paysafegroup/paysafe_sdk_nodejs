@@ -1,21 +1,46 @@
-import { Profile } from '../customervault/profile'
-import { GenericObject } from '../generic'
-import { BillingDetails } from './billingDetails'
-import { CardExpiry } from './cardExpiry'
+import { IProfile, Profile } from '../customervault/profile'
+import { GenericObject, IGenericObject } from '../generic'
+import { BillingDetails, IBillingDetails } from './billingDetails'
+import { CardExpiry, ICardExpiry } from './cardExpiry'
 
+export type CardType = 'AM' | 'DI' | 'JC' | 'MC' | 'MD' | 'SO' | 'VI' | 'VD' | 'VE'
+
+export interface ICard extends IGenericObject {
+  singleUseToken?: string
+  brand?: string
+  nickName?: string
+  merchantRefNum?: string
+  holderName?: string
+  billingAddressId?: string
+  billingDetails?: BillingDetails | IBillingDetails
+  defaultCardIndicator?: string
+  paymentToken?: string
+  cardNum?: string
+  type?: CardType
+  lastDigits?: string
+  cardExpiry?: CardExpiry | ICardExpiry
+  cvv?: string
+  track1?: string
+  track2?: string
+  profile?: Profile | IProfile
+  status?: string
+}
+
+/**
+ * To use a saved card, you must specify paymentToken and the cvv again.
+ */
 export class Card extends GenericObject {
   singleUseToken: string
   brand: string
   nickName: string
   merchantRefNum: string
   holderName: string
-  cardType: string
   billingAddressId: string
   billingDetails: BillingDetails
   defaultCardIndicator: string
   paymentToken: string
   cardNum: string
-  type: string
+  type: CardType
   lastDigits: string
   cardExpiry: CardExpiry
   cvv: string
@@ -24,7 +49,7 @@ export class Card extends GenericObject {
   profile?: Profile
   status: string
 
-  constructor(resp) {
+  constructor(resp?: ICard) {
     super(resp)
     if (resp) {
       if (resp.singleUseToken) {
@@ -42,18 +67,15 @@ export class Card extends GenericObject {
       if (resp.holderName) {
         this.holderName = resp.holderName
       }
-      if (resp.cardType) {
-        this.cardType = resp.cardType
-      }
       if (resp.billingAddressId) {
         this.billingAddressId = resp.billingAddressId
       }
       if (resp.billingDetails) {
-        if (resp.billingDetails instanceof Array) {
-          this.billingDetails = resp.billingDetails.map((bd) => new BillingDetails(bd))
-        } else {
-          this.billingDetails = resp.billingDetails
-        }
+        // if (resp.billingDetails instanceof Array) {
+        //   this.billingDetails = resp.billingDetails.map((bd) => new BillingDetails(bd))
+        // } else {
+        this.billingDetails = new BillingDetails(resp.billingDetails)
+        // }
       }
       if (resp.defaultCardIndicator !== undefined) {
         this.defaultCardIndicator = resp.defaultCardIndicator
@@ -147,14 +169,6 @@ export class Card extends GenericObject {
     return this.billingDetails
   }
 
-  setCardType(cardType) {
-    this.cardType = cardType
-  }
-
-  getCardType() {
-    return this.cardType
-  }
-
   setNickName(nickName) {
     this.nickName = nickName
   }
@@ -187,7 +201,7 @@ export class Card extends GenericObject {
     return this.paymentToken
   }
 
-  setCardNum(cardNum) {
+  setCardNum(cardNum: string) {
     this.cardNum = cardNum
   }
 
@@ -195,7 +209,7 @@ export class Card extends GenericObject {
     return this.cardNum
   }
 
-  setType(type) {
+  setType(type: CardType) {
     this.type = type
   }
 
@@ -235,11 +249,11 @@ export class Card extends GenericObject {
     return this.track1
   }
 
-  settrack2(track2) {
+  setTrack2(track2) {
     this.track2 = track2
   }
 
-  gettrack2() {
+  getTrack2() {
     return this.track2
   }
 }

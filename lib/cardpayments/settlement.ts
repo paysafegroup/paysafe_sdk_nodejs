@@ -2,6 +2,8 @@ import { GenericLinkedObject } from '../generic-linked-object'
 import { AcquirerResponse } from './acquirerResponse'
 import { Authorization } from './authorization'
 
+export type SettlementStatus = 'RECEIVED' | 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
+
 export class Settlement extends GenericLinkedObject {
   /**
    * This is the merchant reference number created by the merchant and submitted as part of the request. It must be unique for each request.
@@ -30,7 +32,7 @@ export class Settlement extends GenericLinkedObject {
    * FAILED – The transaction failed, due to either an error or being declined.
    * CANCELLED – The transaction request has been cancelled.
    */
-  status: 'RECEIVED' | 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
+  status: SettlementStatus
 
   riskReasonCode: number[]
   acquirerResponse: AcquirerResponse
@@ -41,7 +43,7 @@ export class Settlement extends GenericLinkedObject {
   confirmationNumber: string
   authType: string
 
-  constructor(resp) {
+  constructor(resp?: any) {
     super(resp)
 
     if (resp) {
@@ -147,7 +149,7 @@ export class Settlement extends GenericLinkedObject {
     return this.settlements
   }
 
-  setStatus(status) {
+  setStatus(status: SettlementStatus) {
     this.status = status
   }
 

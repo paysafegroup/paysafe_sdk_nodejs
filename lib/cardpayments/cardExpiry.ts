@@ -1,8 +1,13 @@
-export class CardExpiry {
+export interface ICardExpiry {
+  month: number
+  year: number
+}
+
+export class CardExpiry implements ICardExpiry {
   month: number
   year: number
 
-  constructor(resp) {
+  constructor(resp?: ICardExpiry) {
     if (resp) {
       if (resp.month) {
         this.month = resp.month
@@ -13,7 +18,7 @@ export class CardExpiry {
     }
   }
 
-  setMonth(month) {
+  setMonth(month: number) {
     this.month = month
   }
 
@@ -21,7 +26,7 @@ export class CardExpiry {
     return this.month
   }
 
-  setYear(year) {
+  setYear(year: number) {
     this.year = year
   }
 

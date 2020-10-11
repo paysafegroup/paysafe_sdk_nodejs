@@ -3,13 +3,13 @@ import { MerchantACHBankAccount } from './account/ACHBankAccount'
 import { MerchantBACSBankAccount } from './account/BACSBankAccount'
 import { BusinessOwner } from './account/businessOwner'
 import { MerchantEFTBankAccount } from './account/EFTBankAccount'
-import { Merchant } from './account/merchant'
-import { MerchantAccount } from './account/merchantAccount'
+import { IMerchant, Merchant } from './account/merchant'
+import { IMerchantAccount, MerchantAccount } from './account/merchantAccount'
 import { MerchantDescriptor } from './account/merchantDescriptor'
 import { MicroDeposit } from './account/microdeposit'
 import { RecoveryQuestion } from './account/recoveryQuestion'
 import { MerchantSEPABankAccount } from './account/SEPABankAccount'
-import { Terms } from './account/terms'
+import { ITerms, Terms } from './account/terms'
 import { User } from './account/user'
 import { PaysafeAPIDetails } from './api-details'
 import { AccordD } from './cardpayments/accordD'
@@ -45,8 +45,8 @@ import { EnrollmentCheck } from './threedsecure/enrollmentchecks'
 import { ThreeDsecureServiceHandler } from './ThreeDsecureServiceHandler'
 
 export {
-  Merchant,
-  MerchantAccount,
+  Merchant, IMerchant,
+  MerchantAccount, IMerchantAccount,
   MerchantACHBankAccount,
   MerchantBACSBankAccount,
   MerchantEFTBankAccount,
@@ -55,7 +55,7 @@ export {
   User,
   RecoveryQuestion,
   BusinessOwner,
-  Terms,
+  Terms, ITerms,
   Card,
   AccordD,
   Authentication,
