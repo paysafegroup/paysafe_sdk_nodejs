@@ -1,0 +1,4 @@
+{
+  "extends": "@gettilled/tslint-preset",
+  "rulesDirectory": []
+}

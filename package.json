@@ -1,66 +1,73 @@
 {
-  "_from": "github:patientpal/paysafe_sdk_nodejs",
-  "_id": "NodePaysafeSDK@1.0.0",
-  "_inBundle": false,
-  "_integrity": "",
-  "_location": "/NodePaysafeSDK",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "git",
-    "raw": "NodePaysafeSDK@github:patientpal/paysafe_sdk_nodejs",
-    "name": "NodePaysafeSDK",
-    "escapedName": "NodePaysafeSDK",
-    "rawSpec": "github:patientpal/paysafe_sdk_nodejs",
-    "saveSpec": "github:patientpal/paysafe_sdk_nodejs",
-    "fetchSpec": null,
-    "gitCommittish": null
-  },
-  "_requiredBy": [
-    "/"
+  "name": "node-paysafe",
+  "version": "0.1.0",
+  "description": "Typescript-friendly SDK for Paysafe",
+  "keywords": [
+    "paysafe"
   ],
-  "_resolved": "github:patientpal/paysafe_sdk_nodejs#ec663a171652e62e28c14a418f5a09f288a29164",
-  "_spec": "NodePaysafeSDK@github:patientpal/paysafe_sdk_nodejs",
-  "_where": "/Users/franciscobueno/WebstormProjects/backend",
   "author": {
-    "name": "Opus Softwares Pvt. Ltd."
+    "name": "Get Tilled, LLC"
   },
-  "bundleDependencies": false,
-  "contributors": [
-    {
-      "name": "Anup Warke",
-      "email": "anup.w@opussoft.com"
-    },
-    {
-      "name": "Atul Patil",
-      "email": "atul.patil@opussoft.com"
-    },
-    {
-      "name": "Girish Ahirrao",
-      "email": "Girish.Ahirrao@opussoft.com"
-    }
-  ],
+  "license": "ISC",
+  "main": "./dist/lib/",
+  "typings": "./dist/lib/index.d.ts",
+  "scripts": {
+    "prebuild": "check-engine && rm -rf dist",
+    "build": "tsc",
+    "pretest": "npm run build -- -p ./tsconfig.test.json",
+    "test": "mocha --timeout 20000 --recursive dist",
+    "prepublishOnly": "npm run build",
+    "lint": "tslint -c tslint.json 'lib/**/*.ts'",
+    "fix": "tslint -c tslint.json --fix 'lib/**/*.ts'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gettilled/paysafe_sdk_nodejs"
+  },
+  "bugs": {
+    "url": "https://github.com/gettilled/paysafe_sdk_nodejs/issues"
+  },
+  "homepage": "https://github.com/gettilled/paysafe_sdk_nodejs#readme",
+  "engines": {
+    "node": ">=8.10.0"
+  },
   "dependencies": {
     "request": "^2.53.0"
   },
-  "deprecated": false,
-  "description": "Nodejs SDK for Paysafe",
   "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@gettilled/commitlint-preset": "^1.0.4",
+    "@gettilled/tslint-preset": "^1.0.10",
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/git": "^9.0.0",
+    "@types/chai": "^4.2.13",
+    "@types/mocha": "^8.0.3",
+    "@types/node": "^14.11.8",
+    "chai": "^4.2.0",
+    "check-engine": "^1.8.1",
+    "codelyzer": "^6.0.1",
     "express": "4.12.3",
-    "nodeunit": "^0.9.0"
+    "husky": "^4.3.0",
+    "mocha": "^8.1.3",
+    "semantic-release": "^17.1.2",
+    "tslint": "^6.1.3",
+    "typescript": "^4.0.3"
   },
-  "keywords": [
-    "NodePaysafeSDK",
-    "node.js",
-    "eclipse",
-    "nodeclipse"
-  ],
-  "license": "",
-  "main": "./lib",
-  "name": "NodePaysafeSDK",
-  "repository": "",
-  "scripts": {
-    "test": "echo No test to execute."
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   },
-  "types": "./index.d.ts",
-  "version": "1.0.0"
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@gettilled/commitlint-preset"
+    ]
+  }
 }

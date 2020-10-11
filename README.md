@@ -1,18 +1,6 @@
-
-
-# NodePaysafeSDK
-
-
+# Paysafe SDK for Node.js
 
 ## Usage
-
-# Running Sample Code
-
-Navigate to test folder at NodePaysafeSDK->test in Project explore.
-
-Run test case in test folder as Node Application.
-
-Response displayed eclipse console. 
 
 # Running Sample Application
 

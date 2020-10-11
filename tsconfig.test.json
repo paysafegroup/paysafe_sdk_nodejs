@@ -1,0 +1,7 @@
+{
+    "extends": "./tsconfig.jsom",
+    "compilerOptions": {
+        "diagnostics": true
+    },
+    "exclude": []
+}
