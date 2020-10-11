@@ -7,7 +7,6 @@ export type CardType = 'AM' | 'DI' | 'JC' | 'MC' | 'MD' | 'SO' | 'VI' | 'VD' | '
 
 export interface ICard extends IGenericObject {
   singleUseToken?: string
-  brand?: string
   nickName?: string
   merchantRefNum?: string
   holderName?: string
@@ -31,7 +30,6 @@ export interface ICard extends IGenericObject {
  */
 export class Card extends GenericObject {
   singleUseToken: string
-  brand: string
   nickName: string
   merchantRefNum: string
   holderName: string
@@ -54,9 +52,6 @@ export class Card extends GenericObject {
     if (resp) {
       if (resp.singleUseToken) {
         this.singleUseToken = resp.singleUseToken
-      }
-      if (resp.brand) {
-        this.brand = resp.brand
       }
       if (resp.nickName) {
         this.nickName = resp.nickName
@@ -113,20 +108,12 @@ export class Card extends GenericObject {
     }
   }
 
-  setSingleUseToken(singleUseToken) {
+  setSingleUseToken(singleUseToken: string) {
     this.singleUseToken = singleUseToken
   }
 
   getSingleUseToken() {
     return this.singleUseToken
-  }
-
-  setBrand(brand) {
-    this.brand = brand
-  }
-
-  getBrand() {
-    return this.brand
   }
 
   setStatus(status) {
@@ -137,8 +124,8 @@ export class Card extends GenericObject {
     return this.status
   }
 
-  setProfile(profile) {
-    this.profile = profile
+  setProfile(profile: Profile | IProfile) {
+    this.profile = new Profile(profile)
   }
 
   getProfile() {
@@ -153,7 +140,7 @@ export class Card extends GenericObject {
     return this.defaultCardIndicator
   }
 
-  setBillingAddressId(billingAddressId) {
+  setBillingAddressId(billingAddressId: string) {
     this.billingAddressId = billingAddressId
   }
 
@@ -161,15 +148,15 @@ export class Card extends GenericObject {
     return this.billingAddressId
   }
 
-  setBillingDetails(billingDetails: BillingDetails) {
-    this.billingDetails = billingDetails
+  setBillingDetails(billingDetails: BillingDetails | IBillingDetails) {
+    this.billingDetails = new BillingDetails(billingDetails)
   }
 
   getBillingDetails() {
     return this.billingDetails
   }
 
-  setNickName(nickName) {
+  setNickName(nickName: string) {
     this.nickName = nickName
   }
 
@@ -177,7 +164,7 @@ export class Card extends GenericObject {
     return this.nickName
   }
 
-  setMerchantRefNum(merchantRefNum) {
+  setMerchantRefNum(merchantRefNum: string) {
     this.merchantRefNum = merchantRefNum
   }
 
@@ -185,7 +172,7 @@ export class Card extends GenericObject {
     return this.merchantRefNum
   }
 
-  setHolderName(holderName) {
+  setHolderName(holderName: string) {
     this.holderName = holderName
   }
 
@@ -193,7 +180,7 @@ export class Card extends GenericObject {
     return this.holderName
   }
 
-  setPaymentToken(paymentToken) {
+  setPaymentToken(paymentToken: string) {
     this.paymentToken = paymentToken
   }
 
@@ -217,7 +204,7 @@ export class Card extends GenericObject {
     return this.type
   }
 
-  setLastDigits(lastDigits) {
+  setLastDigits(lastDigits: string) {
     this.lastDigits = lastDigits
   }
 
@@ -225,15 +212,15 @@ export class Card extends GenericObject {
     return this.lastDigits
   }
 
-  setCardExpiry(cardExpiry) {
-    this.cardExpiry = cardExpiry
+  setCardExpiry(cardExpiry: CardExpiry | ICardExpiry) {
+    this.cardExpiry = new CardExpiry(cardExpiry)
   }
 
   getCardExpiry() {
     return this.cardExpiry
   }
 
-  setCvv(cvv) {
+  setCvv(cvv: string) {
     this.cvv = cvv
   }
 
@@ -241,7 +228,7 @@ export class Card extends GenericObject {
     return this.cvv
   }
 
-  setTrack1(track1) {
+  setTrack1(track1: string) {
     this.track1 = track1
   }
 
@@ -249,7 +236,7 @@ export class Card extends GenericObject {
     return this.track1
   }
 
-  setTrack2(track2) {
+  setTrack2(track2: string) {
     this.track2 = track2
   }
 

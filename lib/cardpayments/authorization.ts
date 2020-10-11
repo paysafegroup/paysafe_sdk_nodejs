@@ -1,10 +1,10 @@
-import { MerchantDescriptor } from '../account/merchantDescriptor'
-import { Profile } from '../customervault/profile'
+import { IMerchantDescriptor, MerchantDescriptor } from '../account/merchantDescriptor'
+import { IProfile, Profile } from '../customervault/profile'
 import { GenericLinkedObject, IGenericLinkedObject } from '../generic-linked-object'
 import { AccordD } from './accordD'
 import { AcquirerResponse } from './acquirerResponse'
 import { Authentication } from './authentication'
-import { BillingDetails } from './billingDetails'
+import { BillingDetails, IBillingDetails } from './billingDetails'
 import { Card } from './card'
 import { MasterPass } from './masterPass'
 import { Settlement } from './settlement'
@@ -25,14 +25,14 @@ export interface IAuthorization extends IGenericLinkedObject {
   card?: Card
   authentication?: Authentication
   authCode?: string
-  profile?: Profile
-  billingDetails?: BillingDetails
+  profile?: Profile | IProfile
+  billingDetails?: BillingDetails | IBillingDetails
   shippingDetails?: ShippingDetails
   recurring?: Recurring
   customerIp?: string
   dupCheck?: boolean
   keywords?: string[]
-  merchantDescriptor?: MerchantDescriptor
+  merchantDescriptor?: MerchantDescriptor | IMerchantDescriptor
   accordD?: AccordD
   description?: string
   masterPass?: MasterPass
@@ -44,7 +44,7 @@ export interface IAuthorization extends IGenericLinkedObject {
   riskReasonCode?: number[]
   acquirerResponse?: AcquirerResponse
   visaAdditionalAuthData?: VisaAdditionalAuthData
-  auths?: Authorization[]
+  auths?: (Authorization | IAuthorization)[]
   settlements?: Settlement[]
 }
 
@@ -190,8 +190,7 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.auths
   }
 
-  setShippingDetails(
-      shippingDetails) {
+  setShippingDetails(shippingDetails: ShippingDetails) {
     this.shippingDetails = shippingDetails
   }
 
@@ -199,8 +198,7 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.shippingDetails
   }
 
-  setVisaAdditionalAuthData(
-      visaAdditionalAuthData) {
+  setVisaAdditionalAuthData(visaAdditionalAuthData: VisaAdditionalAuthData) {
     this.visaAdditionalAuthData = visaAdditionalAuthData
   }
 
@@ -208,14 +206,15 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.visaAdditionalAuthData
   }
 
-  setAcquirerResponse(acquirerResponse) {
+  setAcquirerResponse(acquirerResponse: AcquirerResponse) {
     this.acquirerResponse = acquirerResponse
   }
+
   getAcquirerResponse() {
     return this.acquirerResponse
   }
 
-  setRiskReasonCode(riskReasonCode) {
+  setRiskReasonCode(riskReasonCode: number[]) {
     this.riskReasonCode = riskReasonCode
   }
 
@@ -255,14 +254,15 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.txnTime
   }
 
-  setMasterPass(masterPass) {
+  setMasterPass(masterPass: MasterPass) {
     this.masterPass = masterPass
   }
+
   getMasterPass() {
     return this.masterPass
   }
 
-  setDescription(description) {
+  setDescription(description: string) {
     this.description = description
   }
 
@@ -270,30 +270,31 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.description
   }
 
-  setAccordD(accordD) {
+  setAccordD(accordD: AccordD) {
     this.accordD = accordD
   }
+
   getAccordD() {
     return this.accordD
   }
 
-  setMerchantDescriptor(
-      merchantDescriptor) {
-    this.merchantDescriptor = merchantDescriptor
+  setMerchantDescriptor(merchantDescriptor: MerchantDescriptor | IMerchantDescriptor) {
+    this.merchantDescriptor = new MerchantDescriptor(merchantDescriptor)
   }
 
   getMerchantDescriptor() {
     return this.merchantDescriptor
   }
 
-  setCard(card) {
+  setCard(card: Card) {
     this.card = card
   }
+
   getCard() {
     return this.card
   }
 
-  setKeywords(keywords) {
+  setKeywords(keywords: string[]) {
     this.keywords = keywords
   }
 
@@ -317,29 +318,31 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.recurring
   }
 
-  setBillingDetails(billingDetails) {
-    this.billingDetails = billingDetails
+  setBillingDetails(billingDetails: BillingDetails | IBillingDetails) {
+    this.billingDetails = new BillingDetails(billingDetails)
   }
+
   getBillingDetails() {
     return this.billingDetails
   }
 
-  setProfile(profile) {
-    this.profile = profile
+  setProfile(profile: Profile | IProfile) {
+    this.profile = new Profile(profile)
   }
 
   getProfile() {
     return this.profile
   }
 
-  setAuthCode(authCode) {
+  setAuthCode(authCode: string) {
     this.authCode = authCode
   }
+
   getAuthCode() {
     return this.authCode
   }
 
-  setCustomerIp(customerIp) {
+  setCustomerIp(customerIp: string) {
     this.customerIp = customerIp
   }
 
@@ -347,7 +350,7 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.customerIp
   }
 
-  setAuthentication(authentication) {
+  setAuthentication(authentication: Authentication) {
     this.authentication = authentication
   }
 
@@ -355,14 +358,15 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.authentication
   }
 
-  setChildAccountNum(childAccountNum) {
+  setChildAccountNum(childAccountNum: string) {
     this.childAccountNum = childAccountNum
   }
+
   getChildAccountNum() {
     return this.childAccountNum
   }
 
-  setAvailableToSettle(availableToSettle) {
+  setAvailableToSettle(availableToSettle: number) {
     this.availableToSettle = availableToSettle
   }
 
@@ -370,9 +374,10 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.availableToSettle
   }
 
-  setSettleWithAuth(settleWithAuth) {
+  setSettleWithAuth(settleWithAuth: boolean) {
     this.settleWithAuth = settleWithAuth
   }
+
   getSettleWithAuth() {
     return this.settleWithAuth
   }

@@ -1,8 +1,13 @@
-export class MerchantDescriptor {
-  dynamicDescriptor: string
-  phone: string
+export interface IMerchantDescriptor {
+  dynamicDescriptor?: string
+  phone?: string
+}
 
-  constructor(resp) {
+export class MerchantDescriptor {
+  dynamicDescriptor?: string
+  phone?: string
+
+  constructor(resp?: IMerchantDescriptor) {
     if (resp) {
       if (resp.dynamicDescriptor) {
         this.dynamicDescriptor = resp.dynamicDescriptor
@@ -13,7 +18,7 @@ export class MerchantDescriptor {
     }
   }
 
-  setDynamicDescriptor(dynamicDescriptor) {
+  setDynamicDescriptor(dynamicDescriptor: string) {
     this.dynamicDescriptor = dynamicDescriptor
   }
 
@@ -21,7 +26,7 @@ export class MerchantDescriptor {
     return this.dynamicDescriptor
   }
 
-  setPhone(phone) {
+  setPhone(phone: string) {
     this.phone = phone
   }
 
