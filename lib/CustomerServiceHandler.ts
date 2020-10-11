@@ -1,6 +1,4 @@
-import { PaysafeAPIDetails } from './api-details'
 import { Card } from './cardpayments/card'
-import { PaysafeError } from './common/error'
 import * as constants from './constants'
 import { ACHBankAccount } from './customervault/ACHBankAccount'
 import { Address } from './customervault/address'
@@ -9,8 +7,8 @@ import { EFTBankAccount } from './customervault/EFTBankAccount'
 import { Mandate } from './customervault/mandate'
 import { Profile } from './customervault/profile'
 import { SEPABankAccount } from './customervault/SEPABankAccount'
+import { GenericServiceHandler } from './generic-service-handler'
 import { PaysafeMethod } from './PaysafeMethod'
-import { request } from './PaysafeRequest'
 
 // PATHS
 const URI = 'customervault/v1'
@@ -29,633 +27,331 @@ function prepareURI(path: string) {
   return URI + path
 }
 
-export class CustomerServiceHandler {
-  private _api: PaysafeAPIDetails
-
-  constructor(api: PaysafeAPIDetails) {
-    this._api = api
+export class CustomerServiceHandler extends GenericServiceHandler {
+  async monitor(): Promise<any> {
+    const requestObj = new PaysafeMethod(HEALTH_BEAT_URL, constants.GET)
+    const response = await this.request(requestObj, null)
+    return response
   }
 
-  monitor(responseCallBack) {
-    try {
-      const requestObj = new PaysafeMethod(HEALTH_BEAT_URL, constants.GET)
-      request(this._api, requestObj, null, responseCallBack)
-    } catch (err) {
-      if (typeof (responseCallBack) === 'function') {
-        responseCallBack(err, null)
-      }
+  async createCustomerProfile(profile): Promise<Profile> {
+    const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH), constants.POST)
+    const response = await this.request(requestObj, profile)
+    return new Profile(response)
+  }
+
+  async getCustomerProfile(profile: Profile): Promise<Profile> {
+    if (profile && profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id), constants.GET)
+      const response = await this.request(requestObj, null)
+      return new Profile(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.getCustomerProfile')
     }
   }
 
-  createCustomerProfile(profile, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH), constants.POST)
-        request(this._api, requestObj, profile, (error, response) => {
-          response = response ? new Profile(response) : response
-          responseCallBack(error, response)
-        })
+  async deleteCustomerProfile(profile: Profile): Promise<Profile> {
+    if (profile && profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id), constants.DELETE)
+      const response = await this.request(requestObj, null)
+      return new Profile(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.deleteCustomerProfile')
+    }
+  }
+
+  async updateCustomerProfile(profile: Profile): Promise<Profile> {
+    if (profile && profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id), constants.PUT)
+      const response = await this.request(requestObj, profile)
+      return new Profile(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.updateCustomerProfile')
+    }
+  }
+
+  async createCustomerAddress(address: Address): Promise<Address> {
+    if (address && address.profile && address.profile.id) {
+      const profile = address.profile
+      delete address.profile
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ADDRESS_PATH),
+        constants.POST)
+      const response = await this.request(requestObj, address)
+      return new Address(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.createCustomerAddress')
+    }
+  }
+
+  async getCustomerAddress(address: Address): Promise<Address> {
+    if (address && address.profile && address.profile.id) {
+      const profile = address.profile
+      delete address.profile
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ADDRESS_PATH + address.id),
+        constants.GET)
+      const response = await this.request(requestObj, null)
+      return new Address(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.getCustomerAddress')
+    }
+  }
+
+  async deleteCustomerAddress(address: Address): Promise<Address> {
+    if (address && address.profile && address.profile.id) {
+      const profile = address.profile
+      if (address && address.id) {
+        delete address.profile
+        const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ADDRESS_PATH + address.id),
+          constants.DELETE)
+        const response = await this.request(requestObj, null)
+        return new Address(response)
       } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : createCustomerProfile')
+        throw this.exception('address id is missing  in CustomerServiceHandler.deleteCustomerAddress')
       }
-    } catch (err) {
-      responseCallBack(err, null)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.deleteCustomerAddress')
     }
   }
 
-  getCustomerProfile(profile, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (profile && profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id), constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new Profile(response) : response
-            responseCallBack(error, response)
-          })
+  async updateCustomerAddress(address: Address): Promise<Address> {
+    if (address && address.profile && address.profile.id) {
+      const profile = address.profile
+      if (address && address.id) {
+        delete address.profile
+        const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ADDRESS_PATH + address.id),
+          constants.PUT)
+        const response = await this.request(requestObj, address)
+        return new Address(response)
+      } else {
+        throw this.exception('address id is missing in CustomerServiceHandler.updateCustomerAddress')
+      }
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.updateCustomerAddress')
+    }
+  }
+
+  async lookUpProfileBySubComponent(profile: Profile, params: {
+    inAddress: boolean,
+    inCards: boolean,
+    inACHBankAccounts: boolean,
+    inEFTBankAccounts: boolean,
+  }): Promise<Profile> {
+    if (profile && profile.id) {
+      let toInclude = ''
+      if (params.inAddress) {
+        toInclude = 'addresses'
+      }
+      if (params.inCards) {
+        if (toInclude.length > 0) {
+          toInclude += ','
+          toInclude += 'cards'
         } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : getCustomerProfile')
+          toInclude = 'cards'
         }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : getCustomerProfile')
       }
-    } catch (err) {
-      responseCallBack(err, null)
+      if (params.inACHBankAccounts) {
+        if (toInclude.length > 0) {
+          toInclude += ','
+          toInclude += 'achbankaccounts'
+        } else {
+          toInclude = 'achbankaccounts'
+        }
+      }
+      if (params.inEFTBankAccounts) {
+        if (toInclude.length > 0) {
+          toInclude += ','
+          toInclude += 'eftbankaccounts'
+        } else {
+          toInclude = 'eftbankaccounts'
+        }
+      }
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + '?' + 'fields=' + toInclude), constants.GET)
+      const response = await this.request(requestObj)
+      return new Profile(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.lookUpProfileBySubComponent')
     }
   }
 
-  deleteCustomerProfile(profile, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (profile && profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id), constants.DELETE)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new Profile(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing'
-            + ' in CustomerServiceHandler : deleteCustomerProfile')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : deleteCustomerProfile')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async createCustomerCard(card: Card): Promise<Card> {
+    if (card && card.profile && card.profile.id) {
+      const profile = card.profile
+      delete card.profile
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + CARD_PATH), constants.POST)
+      const response = await this.request(requestObj, card)
+      return new Card(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.createCustomerCard')
     }
   }
 
-  updateCustomerProfile(profile, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (profile && profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id), constants.PUT)
-          request(this._api, requestObj, profile, (error, response) => {
-            response = response ? new Profile(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : updateCustomerProfile')
-        }
+  async getCustomerCard(card: Card): Promise<Card> {
+    if (card && card.profile && card.profile.id) {
+      const profile = card.profile
+      if (card && card.id) {
+        delete card.profile
+        const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + CARD_PATH + card.id),
+          constants.GET)
+        const response = await this.request(requestObj, null)
+        return new Card(response)
       } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : updateCustomerProfile')
+        throw this.exception('card id is missing in CustomerServiceHandler.getCustomerCard')
       }
-    } catch (err) {
-      responseCallBack(err, null)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.getCustomerCard')
     }
   }
 
-  createCustomerAddress(address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (address && address.profile && address.profile.id) {
-          const profile = address.profile
-          delete address.profile
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ADDRESS_PATH),
-            constants.POST)
-          request(this._api, requestObj, address, (error, response) => {
-            response = response ? new Address(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : createCustomerAddress')
-        }
+  async deleteCustomerCard(card: Card): Promise<Card> {
+    if (card && card.profile && card.profile.id) {
+      const profile = card.profile
+      if (card && card.id) {
+        delete card.profile
+        const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + CARD_PATH + card.id),
+          constants.DELETE)
+        const response = await this.request(requestObj, null)
+        return new Card(response)
       } else {
-        console.error('Please provide the responseCallBack'
-          + ' in function CustomerServiceHandler : createCustomerAddress')
+        throw this.exception('card id is missing in CustomerServiceHandler.deleteCustomerCard')
       }
-    } catch (err) {
-      responseCallBack(err, null)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.deleteCustomerCard')
     }
   }
 
-  getCustomerAddress(address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (address && address.profile && address.profile.id) {
-          const profile = address.profile
-          delete address.profile
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ADDRESS_PATH + address.id),
-            constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new Address(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : getCustomerAddress')
-        }
+  async updateCustomerCard(card: Card): Promise<Card> {
+    if (card && card.profile && card.profile.id) {
+      const profile = card.profile
+      if (card && card.id) {
+        delete card.profile
+        const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + CARD_PATH + card.id),
+          constants.PUT)
+        const response = await this.request(requestObj, card)
+        return new Card(response)
       } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : getCustomerAddress')
+        throw this.exception('card id is missing in CustomerServiceHandler.updateCustomerCard')
       }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-
-  deleteCustomerAddress(address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (address && address.profile && address.profile.id) {
-          const profile = address.profile
-          if (address && address.id) {
-            delete address.profile
-            const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ADDRESS_PATH + address.id),
-              constants.DELETE)
-            request(this._api, requestObj, null, (error, response) => {
-              response = response ? new Address(response) : response
-              responseCallBack(error, response)
-            })
-          } else {
-            throw PaysafeError.generate(400,
-              'InvalidRequestException : address id is missing '
-              + ' in CustomerServiceHandler : deleteCustomerAddress')
-          }
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing'
-            + ' in CustomerServiceHandler : deleteCustomerAddress')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : deleteCustomerAddress')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-
-  updateCustomerAddress(address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (address && address.profile && address.profile.id) {
-          const profile = address.profile
-          if (address && address.id) {
-            delete address.profile
-            const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ADDRESS_PATH + address.id),
-              constants.PUT)
-            request(this._api, requestObj, address, (error, response) => {
-              response = response ? new Address(response) : response
-              responseCallBack(error, response)
-            })
-          } else {
-            throw PaysafeError.generate(400,
-              'InvalidRequestException : address id is missing '
-              + 'in CustomerServiceHandler : updateCustomerAddress')
-          }
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : updateCustomerAddress')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : updateCustomerAddress')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-
-  lookUpProfileBySubComponent(
-    responseCallBack, profile, inAddress, inCards, inachbankaccounts, ineftbankaccounts) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (profile && profile.id) {
-          let toInclude = ''
-          if (inAddress) {
-            toInclude = 'addresses'
-          }
-          if (inCards) {
-            if (toInclude.length > 0) {
-              toInclude += ','
-              toInclude += 'cards'
-            } else {
-              toInclude = 'cards'
-            }
-          }
-          if (inachbankaccounts) {
-            if (toInclude.length > 0) {
-              toInclude += ','
-              toInclude += 'achbankaccounts'
-            } else {
-              toInclude = 'achbankaccounts'
-            }
-          }
-          if (ineftbankaccounts) {
-            if (toInclude.length > 0) {
-              toInclude += ','
-              toInclude += 'eftbankaccounts'
-            } else {
-              toInclude = 'eftbankaccounts'
-            }
-          }
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + '?' + 'fields=' + toInclude),
-            constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new Profile(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing'
-            + ' in CustomerServiceHandler : lookUpProfileBySubComponent')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : lookUpProfileBySubComponent')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-
-  createCustomerCard(card, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (card && card.profile && card.profile.id) {
-          const profile = card.profile
-          delete card.profile
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + CARD_PATH), constants.POST)
-          request(this._api, requestObj, card, (error, response) => {
-            response = response ? new Card(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : createCustomerCard')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : createCustomerCard')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-
-  getCustomerCard(card, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (card && card.profile && card.profile.id) {
-          const profile = card.profile
-          if (card && card.id) {
-            delete card.profile
-            const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + CARD_PATH + card.id),
-              constants.GET)
-            request(this._api, requestObj, null, (error, response) => {
-              response = response ? new Card(response) : response
-              responseCallBack(error, response)
-            })
-          } else {
-            throw PaysafeError.generate(400,
-              'InvalidRequestException : card id is missing '
-              + 'in CustomerServiceHandler : getCustomerCard')
-          }
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : getCustomerCard')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : getCustomerCard')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-
-  deleteCustomerCard(card, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (card && card.profile && card.profile.id) {
-          const profile = card.profile
-          if (card && card.id) {
-            delete card.profile
-            const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + CARD_PATH + card.id),
-              constants.DELETE)
-            request(this._api, requestObj, null, (error, response) => {
-              response = response ? new Card(response) : response
-              responseCallBack(error, response)
-            })
-          } else {
-            throw PaysafeError.generate(400,
-              'InvalidRequestException : card id is missing '
-              + 'in CustomerServiceHandler : deleteCustomerCard')
-          }
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing'
-            + ' in CustomerServiceHandler : deleteCustomerCard')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : deleteCustomerCard')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-
-  updateCustomerCard(card, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (card && card.profile && card.profile.id) {
-          const profile = card.profile
-          if (card && card.id) {
-            delete card.profile
-            const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + CARD_PATH + card.id),
-              constants.PUT)
-            request(this._api, requestObj, card, (error, response) => {
-              response = response ? new Card(response) : response
-              responseCallBack(error, response)
-            })
-          } else {
-            throw PaysafeError.generate(400,
-              'InvalidRequestException : card id is missing '
-              + 'in CustomerServiceHandler : updateCustomerCard')
-          }
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : updateCustomerCard')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : updateCustomerCard')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.updateCustomerCard')
     }
   }
 
 
   /**
    * Method for Create ACH Bank Account.
-   *
    */
-  createACHBankAccount(achbankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (achbankAccount && achbankAccount.profile && achbankAccount.profile.id) {
-          const profile = achbankAccount.profile
-          delete achbankAccount.profile
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ACH_BANK_ACC_PATH),
-            constants.POST)
-          request(this._api, requestObj, achbankAccount, (error, response) => {
-            response = response ? new ACHBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : createachbankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack'
-          + ' in function CustomerServiceHandler : createachbankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async createACHBankAccount(bankAccount: ACHBankAccount): Promise<ACHBankAccount> {
+    if (bankAccount && bankAccount.profile && bankAccount.profile.id) {
+      const profile = bankAccount.profile
+      delete bankAccount.profile
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + ACH_BANK_ACC_PATH),
+        constants.POST)
+      const response = await this.request(requestObj, bankAccount)
+      return new ACHBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.createACHBankAccount')
     }
   }
 
   /**
    * Method to Look Up an ACH Bank Account.
-   *
    */
-
-  getACHBankAccount(achBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (achBankAccount && achBankAccount.id && achBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + achBankAccount.profile.id
-            + ACH_BANK_ACC_PATH + '/' + achBankAccount.id), constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new ACHBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : getachBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : getachBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getACHBankAccount(bankAccount: ACHBankAccount): Promise<ACHBankAccount> {
+    if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + ACH_BANK_ACC_PATH + '/' + bankAccount.id), constants.GET)
+      const response = await this.request(requestObj, null)
+      return new ACHBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.getACHBankAccount')
     }
   }
 
   /**
    * Method to Update an ACH Bank Account.
-   *
    */
-
-  updateACHBankAccount(achBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (achBankAccount && achBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + achBankAccount.profile.id
-            + ACH_BANK_ACC_PATH + '/' + achBankAccount.id), constants.PUT)
-          request(this._api, requestObj, achBankAccount, (error, response) => {
-            response = response ? new ACHBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : updateachBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : updateachBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async updateACHBankAccount(bankAccount: ACHBankAccount): Promise<ACHBankAccount> {
+    if (bankAccount && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + ACH_BANK_ACC_PATH + '/' + bankAccount.id), constants.PUT)
+      const response = await this.request(requestObj, bankAccount)
+      return new ACHBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.updateACHBankAccount')
     }
   }
 
   /**
    * Method to Delete an ACH Bank Account.
-   *
    */
-
-  deleteACHBankAccount(achBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (achBankAccount && achBankAccount.id && achBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + achBankAccount.profile.id
-            + ACH_BANK_ACC_PATH + '/' + achBankAccount.id), constants.DELETE)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new ACHBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : deleteachBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : deleteachBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async deleteACHBankAccount(bankAccount: ACHBankAccount): Promise<ACHBankAccount> {
+    if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + ACH_BANK_ACC_PATH + '/' + bankAccount.id), constants.DELETE)
+      const response = await this.request(requestObj, null)
+      return new ACHBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.deleteACHBankAccount')
     }
   }
 
   /*----------------------------BACS_BANK_ACOUNT-----------------------*/
+
   /**
    * Method to Create BACS Bank Account.
-   *
    */
-  createBACSBankAccount(bacsbankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (bacsbankAccount && bacsbankAccount.profile && bacsbankAccount.profile.id) {
-          const profile = bacsbankAccount.profile
-          delete bacsbankAccount.profile
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + BACS_BANK_ACC_PATH),
-            constants.POST)
-          request(this._api, requestObj, bacsbankAccount, (error, response) => {
-            response = response ? new BACSBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : createbacsbankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack'
-          + ' in function CustomerServiceHandler : createbacsbankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async createBACSBankAccount(bankAccount: BACSBankAccount): Promise<BACSBankAccount> {
+    if (bankAccount && bankAccount.profile && bankAccount.profile.id) {
+      const profile = bankAccount.profile
+      delete bankAccount.profile
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + BACS_BANK_ACC_PATH),
+        constants.POST)
+      const response = await this.request(requestObj, bankAccount)
+      return new BACSBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.createbacsbankAccount')
     }
   }
 
   /**
    * Method to Look Up an BACS Bank Account.
-   *
    */
-
-  getBACSBankAccount(bacsBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (bacsBankAccount && bacsBankAccount.id && bacsBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bacsBankAccount.profile.id
-            + BACS_BANK_ACC_PATH + '/' + bacsBankAccount.id), constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new BACSBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : bacsBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : bacsBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getBACSBankAccount(bankAccount: BACSBankAccount): Promise<BACSBankAccount> {
+    if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + BACS_BANK_ACC_PATH + '/' + bankAccount.id), constants.GET)
+      const response = await this.request(requestObj, null)
+      return new BACSBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.getBACSBankAccount')
     }
   }
 
   /**
    * Method to Update an BACS Bank Account.
-   *
    */
-
-  updateBACSBankAccount(bacsBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (bacsBankAccount && bacsBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bacsBankAccount.profile.id
-            + BACS_BANK_ACC_PATH + '/' + bacsBankAccount.id), constants.PUT)
-          request(this._api, requestObj, bacsBankAccount, (error, response) => {
-            response = response ? new BACSBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : updatebacsBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : updatebacsBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async updateBACSBankAccount(bankAccount: BACSBankAccount): Promise<BACSBankAccount> {
+    if (bankAccount && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + BACS_BANK_ACC_PATH + '/' + bankAccount.id), constants.PUT)
+      const response = await this.request(requestObj, bankAccount)
+      return new BACSBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.updateBACSBankAccount')
     }
   }
 
   /**
    * Method to Delete an BACS Bank Account.
-   *
    */
-
-  deleteBACSBankAccount(bacsBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (bacsBankAccount && bacsBankAccount.id && bacsBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bacsBankAccount.profile.id
-            + BACS_BANK_ACC_PATH + '/' + bacsBankAccount.id), constants.DELETE)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new BACSBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : deletebacsBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : deletebacsBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async deleteBACSBankAccount(bankAccount: BACSBankAccount): Promise<BACSBankAccount> {
+    if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + BACS_BANK_ACC_PATH + '/' + bankAccount.id), constants.DELETE)
+      const response = await this.request(requestObj, null)
+      return new BACSBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.deleteBACSBankAccount')
     }
   }
 
@@ -663,249 +359,129 @@ export class CustomerServiceHandler {
 
   /**
    * Method to Create an EFT Bank Account.
-   *
    */
-
-  createEFTBankAccount(eftbankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (eftbankAccount && eftbankAccount.profile && eftbankAccount.profile.id) {
-          const profile = eftbankAccount.profile
-          delete eftbankAccount.profile
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + EFT_BANK_ACC_PATH),
-            constants.POST)
-          request(this._api, requestObj, eftbankAccount, (error, response) => {
-            response = response ? new EFTBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : createeftbankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack'
-          + ' in function CustomerServiceHandler : createeftbankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async createEFTBankAccount(bankAccount: EFTBankAccount): Promise<EFTBankAccount> {
+    if (bankAccount && bankAccount.profile && bankAccount.profile.id) {
+      const profile = bankAccount.profile
+      delete bankAccount.profile
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + EFT_BANK_ACC_PATH),
+        constants.POST)
+      const response = await this.request(requestObj, bankAccount)
+      return new EFTBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.createEFTBankAccount')
     }
   }
 
   /**
    * Method to Lookup an EFT Bank Account.
-   *
    */
-
-
-  getEFTBankAccount(eftBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (eftBankAccount && eftBankAccount.id && eftBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + eftBankAccount.profile.id
-            + EFT_BANK_ACC_PATH + '/' + eftBankAccount.id), constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new EFTBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : eftBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : eftBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getEFTBankAccount(bankAccount: EFTBankAccount): Promise<EFTBankAccount> {
+    if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + EFT_BANK_ACC_PATH + '/' + bankAccount.id), constants.GET)
+      const response = await this.request(requestObj, null)
+      return new EFTBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.getEFTBankAccount')
     }
   }
 
   /**
    * Method to Update an EFT Bank Account.
-   *
    */
-
-  updateEFTBankAccount(eftBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (eftBankAccount && eftBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + eftBankAccount.profile.id
-            + EFT_BANK_ACC_PATH + '/' + eftBankAccount.id), constants.PUT)
-          request(this._api, requestObj, eftBankAccount, (error, response) => {
-            response = response ? new EFTBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : updateeftBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : updateeftBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async updateEFTBankAccount(bankAccount: EFTBankAccount): Promise<EFTBankAccount> {
+    if (bankAccount && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + EFT_BANK_ACC_PATH + '/' + bankAccount.id), constants.PUT)
+      const response = await this.request(requestObj, bankAccount)
+      return new EFTBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.updateEFTBankAccount')
     }
   }
 
   /**
    * Method to delete an EFT Bank Account.
-   *
    */
-
-  deleteEFTBankAccount(eftBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (eftBankAccount && eftBankAccount.id && eftBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + eftBankAccount.profile.id
-            + EFT_BANK_ACC_PATH + '/' + eftBankAccount.id), constants.DELETE)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new EFTBankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : deleteeftBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : deleteeftBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async deleteEFTBankAccount(bankAccount: EFTBankAccount): Promise<EFTBankAccount> {
+    if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + EFT_BANK_ACC_PATH + '/' + bankAccount.id), constants.DELETE)
+      const response = await this.request(requestObj, null)
+      return new EFTBankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.deleteEFTBankAccount')
     }
   }
 
 
   /*---------------------------------SEPA_BANK_ACCOUNT------------------------------*/
+
   /**
    * Method to Create an SEPA Bank Account.
-   *
    */
-
-  createSEPABankAccount(sepabankaccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (sepabankaccount && sepabankaccount.profile && sepabankaccount.profile.id) {
-          const profile = sepabankaccount.profile
-          delete sepabankaccount.profile
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + SEPA_BANK_ACC_PATH), constants.POST)
-          request(this._api, requestObj, sepabankaccount, (error, response) => {
-            response = response ? new SEPABankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : createsepabankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack'
-          + ' in function CustomerServiceHandler : createsepabankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async createSEPABankAccount(bankAccount: SEPABankAccount): Promise<SEPABankAccount> {
+    if (bankAccount && bankAccount.profile && bankAccount.profile.id) {
+      const profile = bankAccount.profile
+      delete bankAccount.profile
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + SEPA_BANK_ACC_PATH), constants.POST)
+      const response = await this.request(requestObj, bankAccount)
+      return new SEPABankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.createSEPABankAccount')
     }
   }
 
   /**
    * Method to Lookup SEPA Bank Account.
-   *
    */
-
-  getSEPABankAccount(sepaBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (sepaBankAccount && sepaBankAccount.id && sepaBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + sepaBankAccount.profile.id
-            + SEPA_BANK_ACC_PATH + '/' + sepaBankAccount.id), constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new SEPABankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : sepaBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : sepaBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getSEPABankAccount(bankAccount: SEPABankAccount): Promise<SEPABankAccount> {
+    if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + SEPA_BANK_ACC_PATH + '/' + bankAccount.id), constants.GET)
+      const response = await this.request(requestObj, null)
+      return new SEPABankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.getSEPABankAccount')
     }
   }
 
   /**
    * Method to Update SEPA Bank Account.
-   *
    */
+  async updateSEPABankAccount(bankAccount: SEPABankAccount): Promise<SEPABankAccount> {
+    if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
+      const profile = bankAccount.profile
+      const sepaid = bankAccount.id
+      delete bankAccount.profile
+      delete bankAccount.id
 
-  updateSEPABankAccount(sepaBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (sepaBankAccount && sepaBankAccount.profile && sepaBankAccount.profile.id) {
-          const profile = sepaBankAccount.profile
-          const sepaid = sepaBankAccount.id
-          delete sepaBankAccount.profile
-          delete sepaBankAccount.id
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + SEPA_BANK_ACC_PATH + '/' + sepaid),
+        constants.PUT)
 
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id + SEPA_BANK_ACC_PATH + '/' + sepaid),
-            constants.PUT)
-
-          request(this._api, requestObj, sepaBankAccount, (error, response) => {
-            response = response ? new SEPABankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : updatesepaBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : updatesepaBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+      const response = await this.request(requestObj, bankAccount)
+      return new SEPABankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.updateSEPABankAccount')
     }
   }
 
   /**
    * Method to Delete SEPA Bank Account.
-   *
    */
-
-  deleteSEPABankAccount(sepaBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (sepaBankAccount && sepaBankAccount.id && sepaBankAccount.profile.id) {
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + sepaBankAccount.profile.id
-            + SEPA_BANK_ACC_PATH + '/' + sepaBankAccount.id), constants.DELETE)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new SEPABankAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : deletesepaBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function'
-          + ' in CustomerServiceHandler : deletesepaBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async deleteSEPABankAccount(bankAccount: SEPABankAccount): Promise<SEPABankAccount> {
+    if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + bankAccount.profile.id
+        + SEPA_BANK_ACC_PATH + '/' + bankAccount.id), constants.DELETE)
+      const response = await this.request(requestObj, null)
+      return new SEPABankAccount(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.deleteSEPABankAccount')
     }
   }
 
-  searchMerchantRefCommon(merchObj) {
+  searchMerchantRefCommon(merchObj: Mandate) {
     let toInclude = ''
     if (merchObj && merchObj.profiles && merchObj.sepabankaccounts) {
       toInclude = PROFILE_PATH + merchObj.profiles.id + SEPA_BANK_ACC_PATH + SEPARATOR + merchObj.sepabankaccounts.id + MANDATES
@@ -917,177 +493,90 @@ export class CustomerServiceHandler {
 
   /**
    * Method to create Mandates.
-   *
    */
-
-  createMandates(mandates, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (mandates && mandates.profiles) {
-          const toInclude = this.searchMerchantRefCommon(mandates)
-          if (mandates.sepabankaccounts) {
-            delete mandates.sepabankaccounts
-            delete mandates.profiles
-          } else if (mandates.bacsbankaccounts) {
-            delete mandates.bacsbankaccounts
-            delete mandates.profiles
-          }
-          const requestObj = new PaysafeMethod(prepareURI(toInclude), constants.POST)
-          request(this._api, requestObj, mandates, (error, response) => {
-            response = response ? new Mandate(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : create_mandates_sepa_bank')
-        }
-
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : create_mandates_sepa_bank')
+  async createMandates(mandate: Mandate): Promise<Mandate> {
+    if (mandate && mandate.profiles) {
+      const toInclude = this.searchMerchantRefCommon(mandate)
+      if (mandate.sepabankaccounts) {
+        delete mandate.sepabankaccounts
+        delete mandate.profiles
+      } else if (mandate.bacsbankaccounts) {
+        delete mandate.bacsbankaccounts
+        delete mandate.profiles
       }
-    } catch (err) {
-      responseCallBack(err, null)
+      const requestObj = new PaysafeMethod(prepareURI(toInclude), constants.POST)
+      const response = await this.request(requestObj, mandate)
+      return new Mandate(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.create_mandates_sepa_bank')
     }
   }
 
-  /*create_mandates_bacs_bankmandates, responseCallBack) {
-      try {
-          if (typeof (responseCallBack) === "function") {
+  /* async create_mandates_bacs_bankmandates): Promise<any> {
+      if (mandates && mandates.profiles && mandates.bacsbankaccounts) {
+          var profile = mandates.profiles;
+          delete mandates.profiles;
 
-              if (mandates && mandates.profiles && mandates.bacsbankaccounts) {
-                  var profile = mandates.profiles;
-                  delete mandates.profiles;
+          var bacsbankaccounts = mandates.bacsbankaccounts;
+          delete mandates.bacsbankaccounts;
 
-                  var bacsbankaccounts = mandates.bacsbankaccounts;
-                  delete mandates.bacsbankaccounts;
-
-                  var requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.getId() +
-                  BACS_BANK_ACC_PATH+bacsbankaccounts.getId() + MANDATES), constants.POST);
-                  request(this._api, requestObj, mandates, function(error, response) {
-                      response = response ? new Mandate(response) : response;
-                      responseCallBack(error, response);
-                  });
-
-              } else {
-                  throw PaysafeError.generate(400,
-                          "InvalidRequestException : profile id is missing "
-                                  + "in CustomerServiceHandler : create_mandates_bacs_bank");
-              }
-
-          } else {
-              console.error("Please provide the responseCallBack function "
-                      + "in CustomerServiceHandler : create_mandates_bacs_bank");
-          }
-      } catch (err) {
-          responseCallBack(err, null);
+          var requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.getId() +
+          BACS_BANK_ACC_PATH+bacsbankaccounts.getId() + MANDATES), constants.POST);
+          const response = await this.request(requestObj, mandates, function(error, response) {
+          return new Mandate(response)
+      } else {
+          throw this.exception("profile id is missing in CustomerServiceHandler.create_mandates_bacs_bank");
       }
   };*/
 
-
   /**
    * Method to Lookup Mandates.
-   *
    */
+  async lookupMandates(mandates: Mandate): Promise<Mandate> {
+    if (mandates && mandates.profiles && mandates.profiles.id) {
+      const profile = mandates.profiles
+      delete mandates.profiles
 
-  lookupMandates(mandates, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-
-        if (mandates && mandates.profiles && mandates.profiles.id) {
-          const profile = mandates.profiles
-          delete mandates.profiles
-
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.getId() + MANDATES + mandates.getId()),
-            constants.GET)
-          request(this._api, requestObj, profile, (error, response) => {
-            response = response ? new Mandate(response) : response
-            responseCallBack(error, response)
-          })
-
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : lookup_mandates')
-        }
-
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : createBACSMandates')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.getId() + MANDATES + mandates.getId()),
+        constants.GET)
+      const response = await this.request(requestObj, profile)
+      return new Mandate(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.lookupMandates')
     }
   }
 
   /**
    * Method to Update Mandates.
-   *
    */
+  async updateMandates(mandates: Mandate): Promise<Mandate> {
+    if (mandates && mandates.profiles && mandates.profiles.id) {
+      const profile = mandates.profiles
+      delete mandates.profiles
 
-  updateMandates(mandates, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-
-        if (mandates && mandates.profiles && mandates.profiles.id) {
-          const profile = mandates.profiles
-          delete mandates.profiles
-
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.getId() + MANDATES + mandates.getId()),
-            constants.PUT)
-          request(this._api, requestObj, mandates, (error, response) => {
-            response = response ? new Mandate(response) : response
-            responseCallBack(error, response)
-          })
-
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : update_mandates')
-        }
-
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : update_mandates')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.getId() + MANDATES + mandates.getId()),
+        constants.PUT)
+      const response = await this.request(requestObj, mandates)
+      return new Mandate(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.updateMandates')
     }
   }
 
   /**
    * Method to Delete Mandates.
-   *
    */
+  async deleteMandates(mandates: Mandate): Promise<Mandate> {
+    if (mandates && mandates.profiles && mandates.profiles.id) {
+      const profile = mandates.profiles
+      delete mandates.profiles
 
-  deleteMandates(mandates, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-
-        if (mandates && mandates.profiles && mandates.profiles.id) {
-          const profile = mandates.profiles
-          delete mandates.profiles
-
-          const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.getId() + MANDATES + mandates.getId()),
-            constants.DELETE)
-          request(this._api, requestObj, profile, (error, response) => {
-            response = response ? new Mandate(response) : response
-            responseCallBack(error, response)
-          })
-
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : profile id is missing '
-            + 'in CustomerServiceHandler : delete_mandates')
-        }
-
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CustomerServiceHandler : delete_mandates')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.getId() + MANDATES + mandates.getId()),
+        constants.DELETE)
+      const response = await this.request(requestObj, profile)
+      return new Mandate(response)
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.deleteMandates')
     }
   }
 }

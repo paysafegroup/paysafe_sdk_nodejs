@@ -15,7 +15,7 @@ export class ACHBankAccount extends GenericObject {
   paymentToken: string
   payMethod: string
   paymentDescriptor: string
-  profile: Profile
+  profile?: Profile
 
   constructor(resp) {
     super(resp)

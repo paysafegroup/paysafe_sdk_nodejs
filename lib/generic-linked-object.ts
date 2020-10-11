@@ -1,25 +1,25 @@
-import { Link } from './common/link'
-import { GenericObject } from './generic'
+import { ILink, Link } from './common/link'
+import { GenericObject, IGenericObject } from './generic'
 
-export class GenericLinkedObject extends GenericObject {
+export interface IGenericLinkedObject extends IGenericObject {
+  links?: (Link | ILink)[]
+}
+
+export class GenericLinkedObject extends GenericObject implements IGenericLinkedObject {
   public links?: Link[]
 
-  constructor(resp) {
+  constructor(resp?: IGenericLinkedObject) {
     super(resp)
 
     if (resp) {
       if (resp.links) {
-        if (resp.links instanceof Array) {
-          this.links = resp.links.map((link) => new Link(link))
-        } else {
-          this.links = resp.links
-        }
+        this.setLinks(resp.links)
       }
     }
   }
 
-  setLinks(links: Link[]) {
-    this.links = links
+  setLinks(links: (Link | ILink)[]) {
+    this.links = links.map((link) => new Link(link))
   }
 
   getLinks() {

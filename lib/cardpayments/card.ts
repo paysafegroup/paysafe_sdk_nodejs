@@ -21,7 +21,7 @@ export class Card extends GenericObject {
   cvv: string
   track1: string
   track2: string
-  profile: Profile
+  profile?: Profile
   status: string
 
   constructor(resp) {

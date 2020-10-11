@@ -1,7 +1,15 @@
-import { FieldErrors } from './fieldErrors'
-import { Link } from './link'
+import { FieldError, IFieldError } from './fieldErrors'
+import { ILink, Link } from './link'
 
-export class PaysafeError {
+export interface IError {
+  code?: string
+  message?: string
+  links?: (Link | ILink)[]
+  fieldErrors?: (FieldError | IFieldError)[]
+  details?: string
+}
+
+export class PaysafeError implements IError {
   /**
    * Helper factory which takes raw paysafe errors and outputs wrapping instances
    */
@@ -14,11 +22,11 @@ export class PaysafeError {
 
   code?: string
   message?: string
-  links?: any[]
-  fieldErrors?: any[]
+  links?: Link[]
+  fieldErrors?: FieldError[]
   details?: string
 
-  constructor(resp) {
+  constructor(resp?: IError) {
     if (resp) {
       if (resp.code) {
         this.code = resp.code
@@ -27,10 +35,10 @@ export class PaysafeError {
         this.message = resp.message
       }
       if (resp.links) {
-          this.links = resp.links.map((link) => new Link(link))
+        this.setLinks(resp.links)
       }
       if (resp.fieldErrors) {
-          this.fieldErrors = resp.fieldErrors.map((fieldError) => new FieldErrors (fieldError))
+        this.setFieldErrors(resp.fieldErrors)
       }
       if (resp.details) {
         this.details = resp.details
@@ -38,7 +46,7 @@ export class PaysafeError {
     }
   }
 
-  setDetails(details) {
+  setDetails(details: string) {
     this.details = details
   }
 
@@ -46,15 +54,15 @@ export class PaysafeError {
     return this.details
   }
 
-  setFieldErrors(fieldErrors) {
-    this.fieldErrors = fieldErrors
+  setFieldErrors(fieldErrors: (FieldError | IFieldError)[]) {
+    this.fieldErrors = fieldErrors.map((fieldError) => new FieldError(fieldError))
   }
 
   getFieldErrors() {
     return this.fieldErrors
   }
 
-  setCode(code) {
+  setCode(code: string) {
     this.code = code
   }
 
@@ -62,7 +70,7 @@ export class PaysafeError {
     return this.code
   }
 
-  setMessage(message) {
+  setMessage(message: string) {
     this.message = message
   }
 
@@ -70,8 +78,8 @@ export class PaysafeError {
     return this.message
   }
 
-  setLinks(links) {
-    this.links = links
+  setLinks(links: (Link | ILink)[]) {
+    this.links = links.map((link) => new Link(link))
   }
 
   getLinks() {

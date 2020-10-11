@@ -15,7 +15,7 @@ export class BACSBankAccount extends GenericLinkedObject {
   lastDigits: string
   paymentToken: string
   mandateReference: string
-  profile: Profile
+  profile?: Profile
 
   constructor(resp) {
     super(resp)

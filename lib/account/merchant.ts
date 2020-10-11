@@ -1,4 +1,8 @@
-import { GenericLinkedObject } from '../generic-linked-object'
+import { GenericLinkedObject, IGenericLinkedObject } from '../generic-linked-object'
+
+export interface IMerchant extends IGenericLinkedObject {
+  name?: string
+}
 
 /**
  * Merchant
@@ -9,7 +13,7 @@ import { GenericLinkedObject } from '../generic-linked-object'
 export class Merchant extends GenericLinkedObject {
   name: string
 
-  constructor(resp) {
+  constructor(resp?: IMerchant) {
     super(resp)
 
     if (resp) {

@@ -1,8 +1,13 @@
-export class Link {
+export interface ILink {
+  rel?: string
+  href?: string
+}
+
+export class Link implements ILink {
   rel: string
   href: string
 
-  constructor(resp) {
+  constructor(resp?: ILink) {
     if (resp) {
       if (resp.rel) {
         this.rel = resp.rel

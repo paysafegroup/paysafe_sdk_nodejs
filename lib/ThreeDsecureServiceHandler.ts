@@ -1,8 +1,7 @@
 import { PaysafeAPIDetails } from './api-details'
-import { PaysafeError } from './common/error'
 import * as constants from './constants'
+import { GenericServiceHandler } from './generic-service-handler'
 import { PaysafeMethod } from './PaysafeMethod'
-import { request } from './PaysafeRequest'
 import { Authentication } from './threedsecure/authentication'
 import { EnrollmentCheck } from './threedsecure/enrollmentchecks'
 
@@ -21,144 +20,71 @@ function prepareURI(path: string, paysafeClient: PaysafeAPIDetails) {
  * @version 1.0 May 2019
  * @see https://developer.paysafe.com/en/3d-secure-2/api/
  */
-export class ThreeDsecureServiceHandler {
-  _api: PaysafeAPIDetails
-
-  constructor(PaysafeApiClient: PaysafeAPIDetails) {
-    this._api = PaysafeApiClient
-  }
-
+export class ThreeDsecureServiceHandler extends GenericServiceHandler {
   /**
    * method for monitor ThreeDsecure API
    */
-  monitor(responseCallBack) {
-    try {
-      const requestObj = new PaysafeMethod(HEALTH_BEAT_URL, constants.GET)
-      request(this._api, requestObj, null, responseCallBack)
-    } catch (err) {
-      if (typeof (responseCallBack) === 'function') {
-        responseCallBack(err, null)
-      }
-    }
+  async monitor(): Promise<any> {
+    const requestObj = new PaysafeMethod(HEALTH_BEAT_URL, constants.GET)
+    const response = await this.request(requestObj)
+    return response
   }
 
   /**
    * method to Submit Enrollment
    */
-  submitEnrollment(enrollmentCheck: EnrollmentCheck, responseCallBack) {
-    try {
-      const clientObj = this._api
-      if (typeof (responseCallBack) === 'function') {
-        const PaysafeReqObj = new PaysafeMethod(prepareURI(ENROLLMENTCHECKS_PATH, clientObj),
-            constants.POST)
-        request(this._api, PaysafeReqObj, enrollmentCheck, (error, response) => {
-          response = response ? new EnrollmentCheck(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-            + 'in ThreeDsecureServiceHandler : Submit')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
+  async submitEnrollment(enrollmentCheck: EnrollmentCheck): Promise<any> {
+    const PaysafeReqObj = new PaysafeMethod(prepareURI(ENROLLMENTCHECKS_PATH, this.api),
+      constants.POST)
+    const response = await this.request(PaysafeReqObj, enrollmentCheck)
+    return new EnrollmentCheck(response)
   }
 
   /**
    * Method to Submit Authentication
    */
-  submitAuthentication(authentication: Authentication, responseCallBack) {
-    try {
-      const clientObj = this._api
-      if (typeof (responseCallBack) === 'function') {
-        const enrollment = authentication ? authentication.getEnrollment() : undefined
-        if (authentication && enrollment && enrollment.id) {
-          delete authentication.enrollmentchecks
-          const PaysafeReqObj = new PaysafeMethod(prepareURI(ENROLLMENTCHECKS_PATH +
-            SEPARATOR + enrollment.getId() + AUTHENTICATION_PATH, clientObj),
-              constants.POST)
-          request(this._api, PaysafeReqObj, authentication, (error, response) => {
-            response = response ? new Authentication(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-              'InvalidRequestException : enrollment id is missing '
-                  + 'in ThreeDsecureServiceHandler : submit_authentication')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-            + 'in ThreeDsecureServiceHandler : lookup')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async submitAuthentication(authentication: Authentication): Promise<any> {
+    const enrollment = authentication ? authentication.getEnrollment() : undefined
+    if (authentication && enrollment && enrollment.id) {
+      delete authentication.enrollmentchecks
+      const PaysafeReqObj = new PaysafeMethod(prepareURI(ENROLLMENTCHECKS_PATH +
+        SEPARATOR + enrollment.getId() + AUTHENTICATION_PATH, this.api),
+        constants.POST)
+      const response = await this.request(PaysafeReqObj, authentication)
+      return new Authentication(response)
+    } else {
+      throw this.exception('enrollment id is missing in ThreeDsecureServiceHandler.submit_authentication')
     }
   }
 
   /**
    * Method to Lookup Authentication
    */
-  lookupAuthentication(authentication: Authentication, responseCallBack) {
-    try {
-      const clientObj = this._api
-      if (typeof (responseCallBack) === 'function') {
-        const PaysafeReqObj = new PaysafeMethod(prepareURI(AUTHENTICATION_PATH + SEPARATOR + authentication.getId(), clientObj),
-            constants.GET)
-        request(this._api, PaysafeReqObj, authentication, (error, response) => {
-          response = response ? new Authentication(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-            + 'in ThreeDsecureServiceHandler : lookup')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
+  async lookupAuthentication(authentication: Authentication): Promise<any> {
+    const PaysafeReqObj = new PaysafeMethod(prepareURI(AUTHENTICATION_PATH + SEPARATOR + authentication.getId(), this.api),
+      constants.GET)
+    const response = await this.request(PaysafeReqObj, authentication)
+    return new Authentication(response)
   }
 
   /**
    * Method to Lookup Authentication Enrollment
    */
-  lookupAuthenticationEnrollment(authentication: Authentication, responseCallBack) {
-    try {
-      const clientObj = this._api
-      if (typeof (responseCallBack) === 'function') {
-        const PaysafeReqObj = new PaysafeMethod(prepareURI(AUTHENTICATION_PATH +
-          SEPARATOR + authentication.getId() + '?fields=enrollmentchecks', clientObj),
-            constants.GET)
-        request(this._api, PaysafeReqObj, authentication, (error, response) => {
-          response = response ? new Authentication(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-            + 'in ThreeDsecureServiceHandler : lookup')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
+  async lookupAuthenticationEnrollment(authentication: Authentication): Promise<any> {
+    const PaysafeReqObj = new PaysafeMethod(prepareURI(AUTHENTICATION_PATH +
+      SEPARATOR + authentication.getId() + '?fields=enrollmentchecks', this.api),
+      constants.GET)
+    const response = await this.request(PaysafeReqObj, authentication)
+    return new Authentication(response)
   }
 
   /**
    * Method to Lookup EnrollmentChecks
    */
-  lookup(enrollmentCheck: EnrollmentCheck, responseCallBack) {
-    try {
-      const clientObj = this._api
-      if (typeof (responseCallBack) === 'function') {
-        const PaysafeReqObj = new PaysafeMethod(prepareURI(ENROLLMENTCHECKS_PATH + SEPARATOR + enrollmentCheck.getId(), clientObj),
-            constants.GET)
-        request(this._api, PaysafeReqObj, enrollmentCheck, (error, response) => {
-          response = response ? new EnrollmentCheck(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-            + 'in ThreeDsecureServiceHandler : lookup')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
+  async lookup(enrollmentCheck: EnrollmentCheck): Promise<any> {
+    const PaysafeReqObj = new PaysafeMethod(prepareURI(ENROLLMENTCHECKS_PATH + SEPARATOR + enrollmentCheck.getId(), this.api),
+      constants.GET)
+    const response = await this.request(PaysafeReqObj, enrollmentCheck)
+    return new EnrollmentCheck(response)
   }
 }

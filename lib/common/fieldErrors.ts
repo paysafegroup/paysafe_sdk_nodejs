@@ -1,8 +1,13 @@
-export class FieldErrors {
+export interface IFieldError {
+  field: string
+  error: string
+}
+
+export class FieldError implements IFieldError {
   field: string
   error: string
 
-  constructor(resp) {
+  constructor(resp?: IFieldError) {
     if (resp) {
       if (resp.field) {
         this.field = resp.field

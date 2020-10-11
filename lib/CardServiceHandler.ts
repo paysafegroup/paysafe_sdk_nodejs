@@ -1,13 +1,14 @@
-import { PaysafeAPIDetails } from './api-details'
 import { Authorization } from './cardpayments/authorization'
 import { AuthorizationReversal } from './cardpayments/authorizationreversal'
+import { Pagination } from './cardpayments/pagination'
 import { Refund } from './cardpayments/refund'
 import { Settlement } from './cardpayments/settlement'
 import { Verification } from './cardpayments/verification'
-import { PaysafeError } from './common/error'
 import * as constants from './constants'
+import { GenericServiceHandler } from './generic-service-handler'
 import { PaysafeMethod } from './PaysafeMethod'
-import { request as paysafeRequest } from './PaysafeRequest'
+
+type MerchantRefType = Authorization | AuthorizationReversal | Settlement | Refund
 
 // PATH
 const HEALTH_BEAT_URL = 'cardpayments/monitor'
@@ -30,322 +31,175 @@ function prepareURI(path, id) {
   return URI + '/accounts/' + id + path
 }
 
-export class CardServiceHandler {
-  constructor(private api: PaysafeAPIDetails) {
+export class CardServiceHandler extends GenericServiceHandler {
+  async monitor() {
+    const requestObj = new PaysafeMethod(HEALTH_BEAT_URL, constants.GET)
+    return this.request(requestObj)
   }
 
-  monitor(responseCallBack) {
-    try {
-      const requestObj = new PaysafeMethod(HEALTH_BEAT_URL, constants.GET)
-      paysafeRequest(this.api, requestObj, null, responseCallBack)
-    } catch (err) {
-      if (typeof (responseCallBack) === 'function') {
-        responseCallBack(err, null)
-      }
+  /**
+   * method for creating an Authorization
+   */
+  async authorize(auth: Authorization): Promise<Authorization> {
+    const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH, this.api.accountNumber), constants.POST)
+    const response = this.request(requestObj, auth)
+    return new Authorization(response)
+  }
+
+  /**
+   * method for Complete a Held Authorization
+   */
+  async approveHeldAuth(auth: Authorization): Promise<Authorization> {
+    if (auth && auth.id) {
+      const authId = auth.id
+      delete auth.id
+      auth.status = 'COMPLETED'
+      const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
+        constants.PUT)
+      const response = this.request(requestObj, auth)
+      return new Authorization(response)
+    } else {
+      throw this.exception('Auth id is missing in CardServiceHandler.approveHeldAuth')
     }
   }
 
   /**
-   * @author Atul.Patil method for creating an Authorization
+   * method for Cancel a Held Authorization
    */
-
-  authorize(auth: Authorization, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH, this.api.accountNumber), constants.POST)
-        paysafeRequest(this.api, requestObj, auth, (error, response) => {
-          response = response ? new Authorization(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CardServiceHandler : authorize')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async cancelHeldAuth(auth: Authorization): Promise<Authorization> {
+    if (auth && auth.id) {
+      const authId = auth.id
+      delete auth.id
+      auth.status = 'CANCELLED'
+      const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
+        constants.PUT)
+      const response = this.request(requestObj, auth)
+      return new Authorization(response)
+    } else {
+      throw this.exception('Auth id is missing in CardServiceHandler.cancelHeldAuth')
     }
   }
 
   /**
-   * @author Atul.Patil method for Complete a Held Authorization
+   * method for reverse an Authorization
    */
-
-  approveHeldAuth(auth: Authorization, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (auth && auth.id) {
-          const authId = auth.id
-          delete auth.id
-          auth.status = 'COMPLETED'
-          const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
-            constants.PUT)
-          paysafeRequest(this.api, requestObj, auth, (error, response) => {
-            response = response ? new Authorization(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : Auth id is missing '
-            + 'in CardServiceHandler : approveHeldAuth')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CardServiceHandler : approveHeldAuth')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async reverseAuth(authReversal: AuthorizationReversal): Promise<AuthorizationReversal> {
+    if (authReversal && authReversal.authorization
+      && authReversal.authorization.id) {
+      const authId = authReversal.authorization.id
+      delete authReversal.authorization
+      const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId + REVERSAUTH, this.api.accountNumber),
+        constants.POST)
+      const response = this.request(requestObj, authReversal)
+      return new AuthorizationReversal(response)
+    } else {
+      throw this.exception('auth id is missing in CardServiceHandler.reverseAuth')
     }
   }
 
   /**
-   * @author Atul.Patil method for Cancel a Held Authorization
+   * method for settle an Authorization.
    */
-
-  cancelHeldAuth(auth: Authorization, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (auth && auth.id) {
-          const authId = auth.id
-          delete auth.id
-          auth.status = 'CANCELLED'
-          const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
-            constants.PUT)
-          paysafeRequest(this.api, requestObj, auth, (error, response) => {
-            response = response ? new Authorization(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : Auth id is missing '
-            + 'in CardServiceHandler : cancelHeldAuth')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CardServiceHandler : cancelHeldAuth')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async settlement(settle: Settlement): Promise<Settlement> {
+    if (settle && settle.authorization && settle.authorization.id) {
+      const authId = settle.authorization.id
+      delete settle.authorization
+      const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId + SETTLEMENTS, this.api.accountNumber),
+        constants.POST)
+      const response = this.request(requestObj, settle)
+      return new Settlement(response)
+    } else {
+      throw this.exception('Auth id is missing in CardServiceHandler.settlement')
     }
   }
 
   /**
-   * @author Atul.Patil method for reverse an Authorization
+   * method for cancel a settlement.
    */
-
-  reverseAuth(authReversal: AuthorizationReversal, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (authReversal && authReversal.authorization
-          && authReversal.authorization.id) {
-          const authId = authReversal.authorization.id
-          delete authReversal.authorization
-          const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId + REVERSAUTH, this.api.accountNumber),
-            constants.POST)
-          paysafeRequest(this.api, requestObj, authReversal, (error, response) => {
-            response = response ? new AuthorizationReversal(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : auth id is missing '
-            + 'in CardServiceHandler : reverseAuth')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CardServiceHandler : reverseAuth')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async cancelSettlement(settle: Settlement): Promise<Settlement> {
+    if (settle && settle.id) {
+      const settlementId = settle.id
+      delete settle.id
+      settle.status = 'CANCELLED'
+      const requestObj = new PaysafeMethod(prepareURI(SETTLEMENTS + '/' + settlementId, this.api.accountNumber),
+        constants.PUT)
+      const response = this.request(requestObj, settle)
+      return new Settlement(response)
+    } else {
+      throw this.exception('settlement id is missing in CardServiceHandler.cancelSettlement')
     }
   }
 
   /**
-   * @author Atul.Patil method for settle an Authorization.
+   * method for refund an Amount.
    */
-
-  settlement(settle: Settlement, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (settle && settle.authorization && settle.authorization.id) {
-          const authId = settle.authorization.id
-          delete settle.authorization
-          const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId + SETTLEMENTS, this.api.accountNumber),
-            constants.POST)
-          paysafeRequest(this.api, requestObj, settle, (error, response) => {
-            response = response ? new Settlement(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : Auth id is missing '
-            + 'in CardServiceHandler : settlement')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CardServiceHandler : settlement')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async refund(refund: Refund): Promise<Refund> {
+    const settlement = refund.getSettlements()
+    if (settlement && settlement.getId()) {
+      const settleId = settlement.getId()
+      delete refund.settlements
+      const requestObj = new PaysafeMethod(prepareURI(SETTLEMENTS + '/' + settleId + REFUNDS, this.api.accountNumber),
+        constants.POST)
+      const response = this.request(requestObj, refund)
+      return new Refund(response)
+    } else {
+      throw this.exception('settlement id is missing in CardServiceHandler.refund')
     }
   }
 
   /**
-   * @author Atul.Patil method for cancel a settlement.
+   * method for cancel a refund.
    */
-
-  cancelSettlement(settle: Settlement, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (settle && settle.id) {
-          const settlementId = settle.id
-          delete settle.id
-          settle.status = 'CANCELLED'
-          const requestObj = new PaysafeMethod(prepareURI(SETTLEMENTS + '/' + settlementId, this.api.accountNumber),
-            constants.PUT)
-          paysafeRequest(this.api, requestObj, settle, (error, response) => {
-            response = response ? new Settlement(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : settlement id is missing '
-            + 'in CardServiceHandler : cancelSettlement')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CardServiceHandler : cancelSettlement')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async cancelRefund(refund: Refund): Promise<Refund> {
+    if (refund && refund.id) {
+      const refundId = refund.id
+      delete refund.id
+      refund.status = 'CANCELLED'
+      const requestObj = new PaysafeMethod(prepareURI(REFUNDS + '/' + refundId, this.api.accountNumber),
+        constants.PUT)
+      const response = this.request(requestObj, refund)
+      return new Refund(response)
+    } else {
+      throw this.exception('settlement id is missing in CardServiceHandler.cancelRefund')
     }
   }
 
   /**
-   * @author Atul.Patil method for refund an Amount.
+   * method for get an Authorization
    */
-
-  refund(refund, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (refund && refund.getSettlements() && refund.getSettlements().getId()) {
-          const settleId = refund.getSettlements().getId()
-          delete refund.settlements
-          const requestObj = new PaysafeMethod(prepareURI(SETTLEMENTS + '/' + settleId + REFUNDS, this.api.accountNumber),
-            constants.POST)
-          paysafeRequest(this.api, requestObj, refund, (error, response) => {
-            response = response ? new Refund(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : settlement id is missing '
-            + 'in CardServiceHandler : refund')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CardServiceHandler : refund')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getAuth(auth: Authorization): Promise<Authorization> {
+    if (auth && auth.id) {
+      const authId = auth.id
+      delete auth.id
+      const PaysafeRequestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
+        constants.GET)
+      const response = this.request(PaysafeRequestObj, null)
+      return new Authorization(response)
+    } else {
+      throw this.exception('Auth id is missing in CardServiceHandler.getAuth')
     }
   }
 
   /**
-   * @author Atul.Patil method for cancel a refund.
+   * method for getting Reverse authorization details
    */
-
-  cancelRefund(refund: Refund, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (refund && refund.id) {
-          const refundId = refund.id
-          delete refund.id
-          refund.status = 'CANCELLED'
-          const requestObj = new PaysafeMethod(prepareURI(REFUNDS + '/' + refundId, this.api.accountNumber),
-            constants.PUT)
-          paysafeRequest(this.api, requestObj, refund, (error, response) => {
-            response = response ? new Refund(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : settlement id is missing '
-            + 'in CardServiceHandler : cancelRefund')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CardServiceHandler : cancelRefund')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getAuthReversal(authReversal: AuthorizationReversal): Promise<AuthorizationReversal> {
+    if (authReversal.id) {
+      const authId = authReversal.id
+      delete authReversal.id
+      const requestObj = new PaysafeMethod(prepareURI(REVERSAUTH + authId, this.api.accountNumber),
+        constants.GET)
+      const response = this.request(requestObj, null)
+      return new AuthorizationReversal(response)
+    } else {
+      throw this.exception('Reverse Auth id is missing in CardServiceHandler.getAuthReversal')
     }
   }
 
   /**
-   * @author Atul.Patil method for get an Authorization
+   * common method for create search by merchant ref. number
    */
-
-  getAuth(auth: Authorization, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (auth && auth.id) {
-          const authId = auth.id
-          delete auth.id
-          const PaysafeRequestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
-            constants.GET)
-          paysafeRequest(this.api, PaysafeRequestObj, null, (error, response) => {
-            response = response ? new Authorization(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : Auth id is missing '
-            + 'in CardServiceHandler : getAuth')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in CardServiceHandler : getAuth')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-
-  /**
-   * @author Atul.Patil method for getting Reverse authorization details
-   */
-
-  getAuthReversal(authReversal: AuthorizationReversal, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (authReversal && authReversal.id) {
-          const authId = authReversal.id
-          delete authReversal.id
-          const requestObj = new PaysafeMethod(prepareURI(REVERSAUTH + authId, this.api.accountNumber),
-            constants.GET)
-          paysafeRequest(this.api, requestObj, null, (error, response) => {
-            response = response ? new AuthorizationReversal(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : Reverse Auth id is missing in'
-            + ' CardServiceHandler : getAuthReversal')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function in'
-          + ' CardServiceHandler : getAuthReversal')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-
-  /**
-   * @author Atul.Patil common method for create search by merchant ref. number
-   */
-
-  searchMerchantRefCommon(merchObj, pagination) {
+  searchMerchantRefCommon(merchObj: MerchantRefType, pagination: Pagination) {
     let toInclude = ''
     if (merchObj && merchObj.merchantRefNum) {
       toInclude = 'merchantRefNum=' + merchObj.merchantRefNum
@@ -368,154 +222,84 @@ export class CardServiceHandler {
   }
 
   /**
-   * @author Atul.Patil method for search authorization, reverse Auth, settlements
+   * method for search authorization, reverse Auth, settlements
    *         and refund using merchant ref number. classObj.constructor.name : get
    *         the name of constructor obj : with name of class with initial letter
    *         capital
    */
-
-  searchByMerchantRef(classObj: Authorization | AuthorizationReversal | Settlement | Refund, pagination, responseCallBack) {
-    try {
-      const constructor = classObj.constructor as typeof Authorization | typeof AuthorizationReversal |
-        typeof Settlement | typeof Refund
-      if (typeof (responseCallBack) === 'function') {
-        if (classObj && classObj.merchantRefNum) {
-          const upperClassName = SEARCHMERACHANTREFERENCE[constructor.name.toUpperCase()]
-          if (upperClassName) {
-            const toInclude = this.searchMerchantRefCommon(classObj, pagination)
-            const requestObj = new PaysafeMethod(prepareURI(upperClassName + '?' + toInclude, this.api.accountNumber),
-              constants.GET)
-            paysafeRequest(this.api, requestObj, null, (error, response) => {
-              response = response ? new constructor(response) : response
-              responseCallBack(error, response)
-            })
-          } else {
-            throw PaysafeError.generate(400, 'InvalidClassException : '
-              + 'Please provide valid class name for search')
-          }
-        } else {
-          throw PaysafeError.generate(400, 'InvalidRequestException : '
-            + 'Please provide merchant ref number for search')
-        }
+  async searchByMerchantRef(classObj: MerchantRefType, pagination: Pagination): Promise<MerchantRefType> {
+    const constructor = classObj.constructor as typeof Authorization | typeof AuthorizationReversal |
+      typeof Settlement | typeof Refund
+    if (classObj && classObj.merchantRefNum) {
+      const upperClassName = SEARCHMERACHANTREFERENCE[constructor.name.toUpperCase()]
+      if (upperClassName) {
+        const toInclude = this.searchMerchantRefCommon(classObj, pagination)
+        const requestObj = new PaysafeMethod(prepareURI(upperClassName + '?' + toInclude, this.api.accountNumber),
+          constants.GET)
+        const response = this.request(requestObj, null)
+        return new constructor(response)
       } else {
-        console.error('Please provide the responseCallBack function in'
-          + ' CardServiceHandler : searchByMerchantRef')
+        throw this.exception('Please provide valid class name for search')
       }
-    } catch (err) {
-      responseCallBack(err, null)
+    } else {
+      throw this.exception('Please provide merchant ref number for search')
     }
   }
 
   /**
-   * @author Atul.Patil method for getting a settlement.
+   * method for getting a settlement.
    */
-
-  getSettlement(settle: Settlement, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (settle && settle.id) {
-          const settlementId = settle.id
-          delete settle.id
-          const requestObj = new PaysafeMethod(prepareURI(SETTLEMENTS + '/' + settlementId, this.api.accountNumber),
-            constants.GET)
-          paysafeRequest(this.api, requestObj, null, (error, response) => {
-            response = response ? new Settlement(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : settlement id is missing in'
-            + ' CardServiceHandler : getSettlement')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function in'
-          + ' CardServiceHandler : getSettlement')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getSettlement(settle: Settlement): Promise<Settlement> {
+    if (settle && settle.id) {
+      const settlementId = settle.id
+      delete settle.id
+      const requestObj = new PaysafeMethod(prepareURI(SETTLEMENTS + '/' + settlementId, this.api.accountNumber),
+        constants.GET)
+      const response = this.request(requestObj, null)
+      return new Settlement(response)
+    } else {
+      throw this.exception('settlement id is missing in CardServiceHandler.getSettlement')
     }
   }
 
   /**
-   * @author Atul.Patil method for getting refund details.
+   * method for getting refund details.
    */
-
-  getRefund(refund: Refund, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (refund && refund.id) {
-          const refundId = refund.id
-          delete refund.id
-          const requestObj = new PaysafeMethod(prepareURI(REFUNDS + '/' + refundId, this.api.accountNumber),
-            constants.GET)
-          paysafeRequest(this.api, requestObj, null, (error, response) => {
-            response = response ? new Refund(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : refund id is missing in'
-            + ' CardServiceHandler : CancelRefund')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function in'
-          + ' CardServiceHandler : CancelRefund')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getRefund(refund: Refund): Promise<Refund> {
+    if (refund && refund.id) {
+      const refundId = refund.id
+      delete refund.id
+      const requestObj = new PaysafeMethod(prepareURI(REFUNDS + '/' + refundId, this.api.accountNumber),
+        constants.GET)
+      const response = this.request(requestObj, null)
+      return new Refund(response)
+    } else {
+      throw this.exception('refund id is missing in CardServiceHandler.getRefund')
     }
   }
 
   /**
-   * @author Atul.Patil method for verifing card and billing details.
+   * method for verifying card and billing details.
    */
-
-  verify(verification: Verification, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(prepareURI(VERIFICATION, this.api.accountNumber),
-          constants.POST)
-        paysafeRequest(this.api, requestObj, verification, (error, response) => {
-          response = response ? new Verification(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function in'
-          + ' CardServiceHandler : verify')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
+  async verify(verification: Verification): Promise<Verification> {
+    const requestObj = new PaysafeMethod(prepareURI(VERIFICATION, this.api.accountNumber), constants.POST)
+    const response = this.request(requestObj, verification)
+    return new Verification(response)
   }
 
   /**
-   * @author Atul.Patil method for get verification.
+   * method for get verification.
    */
-
-  getVerification(verification: Verification, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (verification && verification.id) {
-          const verificationId = verification.id
-          delete verification.id
-          const requestObj = new PaysafeMethod(prepareURI(VERIFICATION + '/' + verificationId, this.api.accountNumber),
-            constants.GET)
-          paysafeRequest(this.api, requestObj, null, (error, response) => {
-            response = response ? new Verification(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : verification id is missing in'
-            + ' CardServiceHandler : getVerification')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function in'
-          + ' CardServiceHandler : getVerification')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getVerification(verification: Verification): Promise<Verification> {
+    if (verification && verification.id) {
+      const verificationId = verification.id
+      delete verification.id
+      const requestObj = new PaysafeMethod(prepareURI(VERIFICATION + '/' + verificationId, this.api.accountNumber),
+        constants.GET)
+      const response = this.request(requestObj, null)
+      return new Verification(response)
+    } else {
+      throw this.exception('verification id is missing in CardServiceHandler.getVerification')
     }
   }
 }
-

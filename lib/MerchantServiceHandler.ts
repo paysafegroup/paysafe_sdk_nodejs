@@ -5,11 +5,10 @@ import { MerchantAccount } from './account/merchantAccount'
 import { MicroDeposit } from './account/microdeposit'
 import { Terms } from './account/terms'
 import { User } from './account/user'
-import { PaysafeError } from './common/error'
 import * as constants from './constants'
 import { Address } from './customervault/address'
+import { GenericServiceHandler } from './generic-service-handler'
 import { PaysafeMethod } from './PaysafeMethod'
-import { request } from './PaysafeRequest'
 
 // PATHS
 const URI = 'accountmanagement/v1'
@@ -34,6 +33,8 @@ const MERCHANT_BANK_ACC_PATH = {
 }
 const SEPARATOR = '/'
 
+type BankAccountTypes = MerchantACHBankAccount
+
 /**
  * Account Management API
  *
@@ -41,629 +42,309 @@ const SEPARATOR = '/'
  * @see https://developer.paysafe.com/en/platforms/accounts/api/
  * @see https://developer.paysafe.com/en/rest-apis/platforms/account-management/getting-started/introduction-to-account-management/
  */
-export class MerchantServiceHandler {
-  private _api: any
-
-  constructor(api) {
-    this._api = api
+export class MerchantServiceHandler extends GenericServiceHandler {
+  async createMerchant(merchant: Merchant): Promise<Merchant> {
+    const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_PATH), constants.POST)
+    const response = await this.request(requestObj, merchant)
+    return new Merchant(response)
   }
 
-  createMerchant(merchant: Merchant, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_PATH), constants.POST)
-        request(this._api, requestObj, merchant, (error, response) => {
-          response = response ? new Merchant(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : createMerchant')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
   /**
-   * @author Francisco Bueno method for getting a Merchant Account-USD CC Consolidated
+   * Method for getting a Merchant Account-USD CC Consolidated
    */
-  getMerchantAccount(responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (this._api.accountNumber) {
-          const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(''), constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new MerchantAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : merchant account id is missing '
-            + 'in MerchantServiceHandler : getMerchantAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for creating a Merchant Account-USD CC Consolidated
-   */
-  createMerchantAccount(merchant: Merchant, merchantAccount: MerchantAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (merchant && merchant.id) {
-          const requestObj = new PaysafeMethod(this.prepareMerchantURI(MERCHANT_NEW_ACCOUNT_PATH, merchant.id),
-            constants.POST)
-          request(this._api, requestObj, merchantAccount, (error, response) => {
-            response = response ? new MerchantAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          console.error('merchant id is missing')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : createMerchantAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for updating a Merchant Account-USD CC Consolidated
-   */
-  updateMerchantAccount(merchantAccount: MerchantAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (merchantAccount && merchantAccount.id) {
-          const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(''),
-            constants.PUT)
-          request(this._api, requestObj, merchantAccount, (error, response) => {
-            response = response ? new MerchantAccount(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : merchant account id is missing '
-            + 'in MerchantServiceHandler : updateMerchantAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : updateMerchantAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for getting a Merchant Business Owner
-   */
-  getMerchantBusinessOwner(businessOwner: BusinessOwner, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (businessOwner && businessOwner.id) {
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BO_PATH + '/' + businessOwner.id),
-            constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new BusinessOwner(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : business owner id is missing '
-            + 'in MerchantServiceHandler : getMerchantBusinessOwner')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantBusinessOwner')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for creating a Merchant Business Owner - Consolidated
-   */
-  createMerchantBusinessOwner(businessOwner: BusinessOwner, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_NEW_BO_PATH),
-          constants.POST)
-        request(this._api, requestObj, businessOwner, (error, response) => {
-          response = response ? new BusinessOwner(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : createMerchantBusinessOwner')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for updating a Merchant Business Owner - Consolidated
-   */
-  updateMerchantBusinessOwner(businessOwner: BusinessOwner, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (businessOwner && businessOwner.id) {
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BO_PATH + '/' + businessOwner.id),
-            constants.PUT)
-          request(this._api, requestObj, businessOwner, (error, response) => {
-            response = response ? new BusinessOwner(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : business owner id is missing '
-            + 'in MerchantServiceHandler : createMerchantBusinessOwner')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : createMerchantBusinessOwner')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getMerchantAccount(): Promise<MerchantAccount> {
+    if (this.api.accountNumber) {
+      const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(''), constants.GET)
+      const response = await this.request(requestObj)
+      return new MerchantAccount(response)
+    } else {
+      throw this.exception('merchant account id is missing in MerchantServiceHandler.getMerchantAccount')
     }
   }
 
   /**
-   * @author Francisco Bueno method for getting a Merchant Business Owner Address
+   * Method for creating a Merchant Account-USD CC Consolidated
    */
-  getMerchantBusinessOwnerAddress(address: Address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (address && address.id) {
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BO_ADD_PATH + '/' + address.id),
-            constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new Address(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : address id is missing '
-            + 'in MerchantServiceHandler : getMerchantBusinessOwnerAddress')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantBusinessOwnerAddress')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async createMerchantAccount(merchant: Merchant, merchantAccount: MerchantAccount): Promise<MerchantAccount> {
+    if (merchant && merchant.id) {
+      const requestObj = new PaysafeMethod(this.prepareMerchantURI(MERCHANT_NEW_ACCOUNT_PATH, merchant.id), constants.POST)
+      const response = await this.request(requestObj, merchantAccount)
+      return new MerchantAccount(response)
+    } else {
+      throw this.exception('merchant id is missing in MerchantServiceHandler.createMerchantAccount')
+    }
+  }
+
+  /**
+   * Method for updating a Merchant Account-USD CC Consolidated
+   */
+  async updateMerchantAccount(merchantAccount: MerchantAccount): Promise<MerchantAccount> {
+    if (merchantAccount && merchantAccount.id) {
+      const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(''), constants.PUT)
+      const response = await this.request(requestObj, merchantAccount)
+      return new MerchantAccount(response)
+    } else {
+      throw this.exception('merchant account id is missing in MerchantServiceHandler.updateMerchantAccount')
     }
   }
   /**
-   * @author Francisco Bueno method for creating a Merchant Business Owner Address
+   * Method for getting a Merchant Business Owner
    */
-  createMerchantBusinessOwnerAddress(address: Address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (address && address.profile && address.profile.id) {
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BO_PATH + '/' + address.profile.id + MERCHANT_BO_ADD_PATH),
-            constants.POST)
-          request(this._api, requestObj, address, (error, response) => {
-            response = response ? new Address(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : business owner id is missing '
-            + 'in MerchantServiceHandler : createMerchantBusinessOwnerAddress')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : createMerchantBusinessOwnerAddress')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getMerchantBusinessOwner(businessOwner: BusinessOwner): Promise<BusinessOwner> {
+    if (businessOwner && businessOwner.id) {
+      const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BO_PATH + '/' + businessOwner.id), constants.GET)
+      const response = await this.request(requestObj)
+      return new BusinessOwner(response)
+    } else {
+      throw this.exception('business owner id is missing in MerchantServiceHandler.getMerchantBusinessOwner')
     }
   }
   /**
-   * @author Francisco Bueno method for updating a Merchant Business Owner Address
+   * Method for creating a Merchant Business Owner - Consolidated
    */
-  updateMerchantBusinessOwnerAddress(address: Address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (address && address.id) {
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BO_ADD_PATH + '/' + address.id),
-            constants.PUT)
-          request(this._api, requestObj, address, (error, response) => {
-            response = response ? new Address(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : address id is missing '
-            + 'in MerchantServiceHandler : updateMerchantBusinessOwnerAddress')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : updateMerchantBusinessOwnerAddress')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
+  async createMerchantBusinessOwner(businessOwner: BusinessOwner): Promise<BusinessOwner> {
+    const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_NEW_BO_PATH), constants.POST)
+    const response = await this.request(requestObj, businessOwner)
+    return new BusinessOwner(response)
   }
   /**
-   * @author Francisco Bueno method for getting a User
+   * Method for updating a Merchant Business Owner - Consolidated
    */
-  getMerchantUser(responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_USERS_PATH),
-          constants.GET)
-        request(this._api, requestObj, null, (error, response) => {
-          response = response ? new User(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantUser')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async updateMerchantBusinessOwner(businessOwner: BusinessOwner): Promise<BusinessOwner> {
+    if (businessOwner && businessOwner.id) {
+      const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BO_PATH + '/' + businessOwner.id), constants.PUT)
+      const response = await this.request(requestObj, businessOwner)
+      return new BusinessOwner(response)
+    } else {
+      throw this.exception('business owner id is missing in MerchantServiceHandler.createMerchantBusinessOwner')
     }
   }
+
   /**
-   * @author Francisco Bueno method for creating a User
+   * Method for getting a Merchant Business Owner Address
    */
-  createMerchantUser(user: User, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_USERS_PATH),
-          constants.POST)
-        request(this._api, requestObj, user, (error, response) => {
-          response = response ? new User(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : createMerchantUser')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getMerchantBusinessOwnerAddress(address: Address): Promise<Address> {
+    if (address && address.id) {
+      const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BO_ADD_PATH + '/' + address.id), constants.GET)
+      const response = await this.request(requestObj, null)
+      return new Address(response)
+    } else {
+      throw this.exception('address id is missing in MerchantServiceHandler.getMerchantBusinessOwnerAddress')
     }
   }
+
   /**
-   * @author Francisco Bueno method for activating Merchant Account
+   * Method for creating a Merchant Business Owner Address
    */
-  activateMerchantAccount(responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_ACTIVATION_PATH),
-          constants.POST)
-        request(this._api, requestObj, { }, (error, response) => {
-          // response = response ? new this._api.Terms(response) : response;
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : acceptMerchantTCAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async createMerchantBusinessOwnerAddress(address: Address): Promise<Address> {
+    if (address && address.profile && address.profile.id) {
+      const uri = this.prepareURI(MERCHANT_BO_PATH + '/' + address.profile.id + MERCHANT_BO_ADD_PATH)
+      const requestObj = new PaysafeMethod(uri, constants.POST)
+      const response = await this.request(requestObj, address)
+      return new Address(response)
+    } else {
+      throw this.exception('business owner id is missing in MerchantServiceHandler.createMerchantBusinessOwnerAddress')
     }
   }
+
   /**
-   * @author Francisco Bueno method for getting a Merchant Address
+   * Method for updating a Merchant Business Owner Address
    */
-  getMerchantAddress(address: Address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (address && address.id) {
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_ADDRESSES_PATH + '/' + address.id),
-            constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new Address(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : address id is missing '
-            + 'in MerchantServiceHandler : getMerchantAddress')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantAddress')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async updateMerchantBusinessOwnerAddress(address: Address): Promise<Address> {
+    if (address && address.id) {
+      const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BO_ADD_PATH + '/' + address.id), constants.PUT)
+      const response = await this.request(requestObj, address)
+      return new Address(response)
+    } else {
+      throw this.exception('address id is missing in MerchantServiceHandler.updateMerchantBusinessOwnerAddress')
     }
   }
+
   /**
-   * @author Francisco Bueno method for creating a Merchant Address
+   * Method for getting a User
    */
-  createMerchantAddress(address: Address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_ADDRESSES_PATH),
-          constants.POST)
-        request(this._api, requestObj, address, (error, response) => {
-          response = response ? new Address(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : createMerchantAccountAddress')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getMerchantUser() {
+    const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_USERS_PATH), constants.GET)
+    const response = await this.request(requestObj)
+    return new User(response)
+  }
+
+  /**
+   * Method for creating a User
+   */
+  async createMerchantUser(user: User): Promise<User> {
+    const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_USERS_PATH), constants.POST)
+    const response = await this.request(requestObj, user)
+    return new User(response)
+  }
+
+  /**
+   * Method for activating Merchant Account
+   */
+  async activateMerchantAccount(): Promise<any> {
+    const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_ACTIVATION_PATH), constants.POST)
+    const response = await this.request(requestObj)
+    return response
+  }
+
+  /**
+   * Method for getting a Merchant Address
+   */
+  async getMerchantAddress(address: Address): Promise<Address> {
+    if (address && address.id) {
+      const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_ADDRESSES_PATH + '/' + address.id), constants.GET)
+      const response = await this.request(requestObj)
+      return new Address(response)
+    } else {
+      throw this.exception('address id is missing in MerchantServiceHandler.getMerchantAddress')
     }
   }
+
   /**
-   * @author Francisco Bueno method for updating a Merchant Address
+   * Method for creating a Merchant Address
    */
-  updateMerchantAddress(address: Address, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (address && address.id) {
-          delete address.profile
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_ADDRESSES_PATH + '/' + address.id),
-            constants.PUT)
-          request(this._api, requestObj, address, (error, response) => {
-            response = response ? new Address(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : address id is missing '
-            + 'in MerchantServiceHandler : updateMerchantAccountAddress')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : updateMerchantAccountAddress')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async createMerchantAddress(address: Address): Promise<Address> {
+    const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_ADDRESSES_PATH), constants.POST)
+    const response = await this.request(requestObj, address)
+    return new Address(response)
+  }
+
+  /**
+   * Method for updating a Merchant Address
+   */
+  async updateMerchantAddress(address: Address): Promise<Address> {
+    if (address && address.id) {
+      delete address.profile
+      const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_ADDRESSES_PATH + '/' + address.id), constants.PUT)
+      const response = await this.request(requestObj, address)
+      return new Address(response)
+    } else {
+      throw this.exception('address id is missing in MerchantServiceHandler.updateMerchantAccountAddress')
     }
   }
+
   /**
-   * @author Francisco Bueno method for getting a Merchant Address
+   * Method for getting a Merchant Address
    */
-  getMerchantBankAccount(bankAccount: MerchantACHBankAccount, responseCallBack) {
-    try {
+  async getMerchantBankAccount(bankAccount: MerchantACHBankAccount): Promise<MerchantACHBankAccount> {
+    const constructor = bankAccount.constructor as typeof MerchantACHBankAccount
+    if (bankAccount && bankAccount.id) {
+      const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BANK_ACC_PATH[bankAccount.type] + '/' + bankAccount.id),
+        constants.GET)
+      const response = await this.request(requestObj, null)
+      return new constructor(response)
+    } else {
+      throw this.exception('bankAccount id is missing in MerchantServiceHandler.getMerchantBankAccount')
+    }
+  }
+
+  /**
+   * Method for creating a Merchant ACH Bank Account
+   */
+  async createMerchantBankAccount(bankAccount: MerchantACHBankAccount): Promise<MerchantACHBankAccount> {
+    const constructor = bankAccount.constructor as typeof MerchantACHBankAccount
+    const uri = this.prepareMerchantAccountURI(MERCHANT_BANK_ACC_PATH[bankAccount.type])
+    const requestObj = new PaysafeMethod(uri, constants.POST)
+    const response = await this.request(requestObj, bankAccount)
+    return new constructor(response)
+  }
+
+  /**
+   * Method for updating a Merchant Bank Account
+   */
+  async updateMerchantBankAccount(bankAccount: MerchantACHBankAccount): Promise<MerchantACHBankAccount> {
+    if (bankAccount && bankAccount.id) {
       const constructor = bankAccount.constructor as typeof MerchantACHBankAccount
-      if (typeof (responseCallBack) === 'function') {
-        if (bankAccount && bankAccount.id) {
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BANK_ACC_PATH[bankAccount.type] + '/' + bankAccount.id),
-            constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new constructor(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : bankAccount id is missing '
-            + 'in MerchantServiceHandler : getMerchantBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for creating a Merchant ACH Bank Account
-   */
-  createMerchantBankAccount(bankAccount: MerchantACHBankAccount, responseCallBack) {
-    try {
-      const constructor = bankAccount.constructor as typeof MerchantACHBankAccount
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(
-          this.prepareMerchantAccountURI(MERCHANT_BANK_ACC_PATH[bankAccount.type]),
-          constants.POST)
-        request(this._api, requestObj, bankAccount, (error, response) => {
-          response = response ? new constructor(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : createMerchantBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for updating a Merchant Bank Account
-   */
-  updateMerchantBankAccount(bankAccount: MerchantACHBankAccount, responseCallBack) {
-    try {
-      const constructor = bankAccount.constructor as typeof MerchantACHBankAccount
-      if (typeof (responseCallBack) === 'function') {
-        if (bankAccount && bankAccount.id) {
-          const requestObj = new PaysafeMethod(
-            this.prepareURI(MERCHANT_BANK_ACC_PATH[bankAccount.type] + '/' + bankAccount.id),
-            constants.PUT)
-          request(this._api, requestObj, bankAccount, (error, response) => {
-            response = response ? new constructor(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : bankaccount id is missing '
-            + 'in MerchantServiceHandler : updateMerchantBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : updateMerchantBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for deleting a Merchant Bank Account
-   */
-  deleteMerchantBankAccount(bankAccount, responseCallBack) {
-    try {
-      const constructor = bankAccount.constructor as typeof MerchantACHBankAccount
-      if (typeof (responseCallBack) === 'function') {
-        if (bankAccount && bankAccount.id) {
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BANK_ACC_PATH[bankAccount.type] + '/' + bankAccount.id),
-            constants.DELETE)
-          request(this._api, requestObj, bankAccount, (error, response) => {
-            response = response ? new constructor(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : account id is missing '
-            + 'in MerchantServiceHandler : deleteMerchantBankAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : deleteMerchantBankAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for getting a Merchant Microdeposit
-   */
-  getMerchantMicroDeposit(id: string, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_MICRODEPOSIT_PATH + SEPARATOR + id),
-          constants.GET)
-        request(this._api, requestObj, null, (error, response) => {
-          // response = response ? new MicroDeposit(response) : response;
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantMicroDeposit')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
-  }
-  /**
-   * @author Francisco Bueno method for creating a Merchant MicroDeposit
-   */
-  createMerchantMicroDeposit(bankAccount: MerchantACHBankAccount, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BANK_ACC_PATH[bankAccount.type] +
-          SEPARATOR + bankAccount.id + MERCHANT_MICRODEPOSIT_PATH),
-          constants.POST)
-        request(this._api, requestObj, { }, (error, response) => {
-          response = response ? new MicroDeposit(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : createMerchantMicroDeposit')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+      const uri = this.prepareURI(MERCHANT_BANK_ACC_PATH[bankAccount.type] + '/' + bankAccount.id)
+      const requestObj = new PaysafeMethod(uri, constants.PUT)
+      const response = await this.request(requestObj, bankAccount)
+      return new constructor(response)
+    } else {
+      throw this.exception('bankaccount id is missing in MerchantServiceHandler.updateMerchantBankAccount')
     }
   }
 
   /**
-   * @author Francisco Bueno method for validating a Merchant MicroDeposit
+   * Method for deleting a Merchant Bank Account
    */
-  validateMerchantMicroDeposit(microDeposit: MicroDeposit, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_MICRODEPOSIT_PATH +
-          SEPARATOR + microDeposit.id + MERCHANT_MICRODEPOSIT_VALIDATE_PATH),
-          constants.POST)
-        request(this._api, requestObj, microDeposit, (error, response) => {
-          response = response ? new MicroDeposit(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantMicroDeposit')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async deleteMerchantBankAccount(bankAccount: MerchantACHBankAccount): Promise<any> {
+    if (bankAccount && bankAccount.id) {
+      const uri = this.prepareURI(MERCHANT_BANK_ACC_PATH[bankAccount.type] + '/' + bankAccount.id)
+      const requestObj = new PaysafeMethod(uri, constants.DELETE)
+      const response = await this.request(requestObj, bankAccount)
+      return response
+    } else {
+      throw this.exception('account id is missing in MerchantServiceHandler.deleteMerchantBankAccount')
     }
   }
 
   /**
-   * @author Francisco Bueno method for looking up Merchant Terms and Conditions Acceptance Request
+   * Method for getting a Merchant MicroDeposit
    */
-  getMerchantAcceptanceTermsAndConditions(term: Terms, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        if (term.id) {
-          const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_TC_PATH + '/' + term.id),
-            constants.GET)
-          request(this._api, requestObj, null, (error, response) => {
-            response = response ? new Terms(response) : response
-            responseCallBack(error, response)
-          })
-        } else {
-          throw PaysafeError.generate(400,
-            'InvalidRequestException : merchant account id is missing '
-            + 'in MerchantServiceHandler : getMerchantAcceptanceTCAccount')
-        }
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantAcceptanceTCAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
+  async getMerchantMicroDeposit(id: string): Promise<MicroDeposit> {
+    const uri = this.prepareURI(MERCHANT_MICRODEPOSIT_PATH + SEPARATOR + id)
+    const requestObj = new PaysafeMethod(uri, constants.GET)
+    const response = await this.request(requestObj, null)
+    return new MicroDeposit(response)
+  }
+
+  /**
+   * Method for creating a Merchant MicroDeposit
+   */
+  async createMerchantMicroDeposit(bankAccount: MerchantACHBankAccount): Promise<MicroDeposit> {
+    const uri = this.prepareURI(MERCHANT_BANK_ACC_PATH[bankAccount.type] + SEPARATOR + bankAccount.id + MERCHANT_MICRODEPOSIT_PATH)
+    const requestObj = new PaysafeMethod(uri, constants.POST)
+    const response = await this.request(requestObj)
+    return new MicroDeposit(response)
+  }
+
+  /**
+   * Method for validating a Merchant MicroDeposit
+   */
+  async validateMerchantMicroDeposit(microDeposit: MicroDeposit): Promise<MicroDeposit> {
+    const uri = this.prepareURI(MERCHANT_MICRODEPOSIT_PATH + SEPARATOR + microDeposit.id + MERCHANT_MICRODEPOSIT_VALIDATE_PATH)
+    const requestObj = new PaysafeMethod(uri, constants.POST)
+    const response = await this.request(requestObj, microDeposit)
+    return new MicroDeposit(response)
+  }
+
+  /**
+   * Method for looking up Merchant Terms and Conditions Acceptance Request
+   */
+  async getMerchantAcceptanceTermsAndConditions(term: Terms): Promise<Terms> {
+    if (term.id) {
+      const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_TC_PATH + '/' + term.id), constants.GET)
+      const response = await this.request(requestObj, null)
+      return new Terms(response)
+    } else {
+      throw this.exception('merchant account id is missing in MerchantServiceHandler.getMerchantAcceptanceTCAccount')
     }
   }
+
   /**
-   * @author Francisco Bueno method for looking up Merchant Terms and Conditions as HTML
+   * Method for looking up Merchant Terms and Conditions as HTML
    */
-  getMerchantTermsAndConditions(responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_TC_PATH),
-          constants.GET)
-        request(this._api, requestObj, null, (error, response) => {
-          // response = response ? new Terms(response) : response;
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : getMerchantTCAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
+  async getMerchantTermsAndConditions(): Promise<string> {
+    const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_TC_PATH), constants.GET)
+    const response = await this.request(requestObj, null)
+    return response
   }
+
   /**
-   * @author Francisco Bueno method for accepting Merchant Terms and Conditions
+   * Method for accepting Merchant Terms and Conditions
    */
-  acceptMerchantTermsAndConditions(terms: Terms, responseCallBack) {
-    try {
-      if (typeof (responseCallBack) === 'function') {
-        const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_TC_PATH),
-          constants.POST)
-        request(this._api, requestObj, { version: terms.version }, (error, response) => {
-          response = response ? new Terms(response) : response
-          responseCallBack(error, response)
-        })
-      } else {
-        console.error('Please provide the responseCallBack function '
-          + 'in MerchantServiceHandler : acceptMerchantTCAccount')
-      }
-    } catch (err) {
-      responseCallBack(err, null)
-    }
+  async acceptMerchantTermsAndConditions(terms: Terms): Promise<Terms> {
+    const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_TC_PATH), constants.POST)
+    const response = await this.request(requestObj, { version: terms.version })
+    return new Terms(response)
   }
 
   private prepareMerchantURI(path: string, id: string) {
     return URI + MERCHANT_PATH + SEPARATOR + id + path
   }
 
-  private prepareMerchantAccountURI(path: string, id = this._api.accountNumber) {
-    return URI + MERCHANT_ACCOUNT_PATH + SEPARATOR + id + path
+  private prepareMerchantAccountURI(path: string) {
+    return URI + MERCHANT_ACCOUNT_PATH + SEPARATOR + this.api.accountNumber + path
   }
 
   private prepareURI(path: string) {

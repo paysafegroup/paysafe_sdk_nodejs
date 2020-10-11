@@ -21,7 +21,7 @@ export class Refund extends GenericLinkedObject {
   txnTime: string
   riskReasonCode: string
   acquirerResponse: AcquirerResponse
-  settlements: Settlement
+  settlements?: Settlement
   refunds: Refund[]
   currencyCode: string
   originalMerchantRefNum: string

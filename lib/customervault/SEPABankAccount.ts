@@ -15,7 +15,7 @@ export class SEPABankAccount extends GenericLinkedObject {
   billingAddressId: string
   paymentToken: string
   mandateReference: string
-  profile: Profile
+  profile?: Profile
 
   constructor(resp) {
     super(resp)

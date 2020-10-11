@@ -11,9 +11,9 @@ export class Mandate extends GenericObject {
   statusReason: string
   paymentToken: string
   status: string
-  profiles: Profile
-  sepabankaccounts: SEPABankAccount
-  bacsbankaccounts: BACSBankAccount
+  profiles?: Profile
+  sepabankaccounts?: SEPABankAccount
+  bacsbankaccounts?: BACSBankAccount
 
   constructor(resp) {
     super(resp)
