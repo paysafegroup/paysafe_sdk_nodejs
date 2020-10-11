@@ -1,0 +1,8 @@
+dist/**/__test__
+.github
+.idea
+.vscode
+.travis.yml
+bin/
+lib/
+docs/

@@ -44,6 +44,47 @@ import { MerchantServiceHandler } from './MerchantServiceHandler'
 import { EnrollmentCheck } from './threedsecure/enrollmentchecks'
 import { ThreeDsecureServiceHandler } from './ThreeDsecureServiceHandler'
 
+export {
+  Merchant,
+  MerchantAccount,
+  MerchantACHBankAccount,
+  MerchantBACSBankAccount,
+  MerchantEFTBankAccount,
+  MerchantSEPABankAccount,
+  MicroDeposit,
+  User,
+  RecoveryQuestion,
+  BusinessOwner,
+  Terms,
+  Card,
+  AccordD,
+  Authentication,
+  Authorization,
+  AuthorizationReversal,
+  BillingDetails,
+  CardExpiry,
+  MasterPass,
+  MerchantDescriptor,
+  Pagination,
+  // RecipientDateOfBirth,
+  Refund,
+  Settlement,
+  ShippingDetails,
+  Verification,
+  VisaAdditionalAuthData,
+  Address,
+  DateOfBirth,
+  Profile,
+  ACHBankAccount,
+  BACSBankAccount,
+  EFTBankAccount,
+  SEPABankAccount,
+  Mandate,
+  Purchase,
+  StandaloneCredit,
+  EnrollmentCheck,
+}
+
 export class Paysafe {
   Merchant = Merchant
   MerchantAccount = MerchantAccount
@@ -57,7 +98,7 @@ export class Paysafe {
   BusinessOwner = BusinessOwner
   Terms = Terms
   Card = Card
-  AccorD = AccordD
+  AccordD = AccordD
   Authentication = Authentication
   Authorization = Authorization
   AuthorizationReversal = AuthorizationReversal
