@@ -1,11 +1,34 @@
 import { Card } from '../cardpayments/card'
-import { GenericObject } from '../generic'
+import { GenericObject, IGenericObject } from '../generic'
 import { ACHBankAccount } from './ACHBankAccount'
 import { Address } from './address'
 import { BACSBankAccount } from './BACSBankAccount'
 import { DateOfBirth } from './dateofbirth'
 import { EFTBankAccount } from './EFTBankAccount'
 import { SEPABankAccount } from './SEPABankAccount'
+
+export interface IProfile extends IGenericObject {
+  status?: string
+  merchantCustomerId?: string
+  locale?: string
+  firstName?: string
+  middleName?: string
+  lastName?: string
+  dateOfBirth?: DateOfBirth
+  ip?: string
+  gender?: string
+  nationality?: string
+  email?: string
+  phone?: string
+  cellPhone?: string
+  paymentToken?: string
+  addresses?: Address[]
+  cards?: Card[]
+  achbankaccounts?: ACHBankAccount[]
+  eftbankaccounts?: EFTBankAccount[]
+  bacsbankaccounts?: BACSBankAccount[]
+  sepabankaccounts?: SEPABankAccount[]
+}
 
 export class Profile extends GenericObject {
   status: string

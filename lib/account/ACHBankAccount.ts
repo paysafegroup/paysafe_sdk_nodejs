@@ -1,4 +1,12 @@
-import { GenericObject } from '../generic'
+import { GenericObject, IGenericObject } from '../generic'
+
+export interface IMerchantACHBankAccount extends IGenericObject {
+  type?: string
+  status?: string
+  statusReason?: string
+  accountNumber?: string
+  routingNumber?: string
+}
 
 export class MerchantACHBankAccount extends GenericObject {
   type: string
@@ -7,7 +15,7 @@ export class MerchantACHBankAccount extends GenericObject {
   accountNumber: string
   routingNumber: string
 
-  constructor(resp) {
+  constructor(resp?: IMerchantACHBankAccount) {
     super(resp)
 
     if (resp) {
@@ -29,7 +37,7 @@ export class MerchantACHBankAccount extends GenericObject {
     }
   }
 
-  setType(type) {
+  setType(type: string) {
     this.type = type
   }
 
@@ -37,7 +45,7 @@ export class MerchantACHBankAccount extends GenericObject {
     return this.type
   }
 
-  setStatus(status) {
+  setStatus(status: string) {
     this.status = status
   }
 
@@ -45,7 +53,7 @@ export class MerchantACHBankAccount extends GenericObject {
     return this.status
   }
 
-  setStatusReason(statusReason) {
+  setStatusReason(statusReason: string) {
     this.statusReason = statusReason
   }
 
@@ -53,7 +61,7 @@ export class MerchantACHBankAccount extends GenericObject {
     return this.statusReason
   }
 
-  setAccountNumber(accountNumber) {
+  setAccountNumber(accountNumber: string) {
     this.accountNumber = accountNumber
   }
 
@@ -61,7 +69,7 @@ export class MerchantACHBankAccount extends GenericObject {
     return this.accountNumber
   }
 
-  setRoutingNumber(routingNumber) {
+  setRoutingNumber(routingNumber: string) {
     this.routingNumber = routingNumber
   }
 

@@ -1,9 +1,15 @@
+export interface IDateOfBirth {
+  year: string
+  month: string
+  day: string
+}
+
 export class DateOfBirth {
   year: string
   month: string
   day: string
 
-  constructor(resp) {
+  constructor(resp?: IDateOfBirth) {
     if (resp) {
       if (resp.year) {
         this.year = resp.year
@@ -17,7 +23,7 @@ export class DateOfBirth {
     }
   }
 
-  setYear(year) {
+  setYear(year: string) {
     this.year = year
   }
 
@@ -25,7 +31,7 @@ export class DateOfBirth {
     return this.year
   }
 
-  setMonth(month) {
+  setMonth(month: string) {
     this.month = month
   }
 
@@ -33,7 +39,7 @@ export class DateOfBirth {
     return this.month
   }
 
-  setDay(day) {
+  setDay(day: string) {
     this.day = day
   }
 

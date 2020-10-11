@@ -16,6 +16,8 @@ export class GenericServiceHandler {
       request(this.api, method, requestObject, (error, response) => {
         if (error) {
           reject(error)
+        } else if (response && response.error) {
+          reject(new PaysafeError(response.error))
         } else {
           resolve(response)
         }

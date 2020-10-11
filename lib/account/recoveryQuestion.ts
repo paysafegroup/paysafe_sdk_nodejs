@@ -1,11 +1,17 @@
-import { GenericObject } from '../generic'
+import { GenericObject, IGenericObject } from '../generic'
+
+export interface IRecoveryQuestion extends IGenericObject {
+  question?: string
+  questionId?: string
+  answer?: string
+}
 
 export class RecoveryQuestion extends GenericObject {
   question: string
   questionId: string
   answer: string
 
-  constructor(resp) {
+  constructor(resp?: IRecoveryQuestion) {
     super(resp)
 
     if (resp) {
@@ -21,7 +27,7 @@ export class RecoveryQuestion extends GenericObject {
     }
   }
 
-  setQuestion(question) {
+  setQuestion(question: string) {
     this.question = question
   }
 
@@ -29,7 +35,7 @@ export class RecoveryQuestion extends GenericObject {
     return this.question
   }
 
-  setQuestionId(questionId) {
+  setQuestionId(questionId: string) {
     this.questionId = questionId
   }
 
@@ -37,7 +43,7 @@ export class RecoveryQuestion extends GenericObject {
     return this.questionId
   }
 
-  setAnswer(answer) {
+  setAnswer(answer: string) {
     this.answer = answer
   }
 

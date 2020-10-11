@@ -1,6 +1,6 @@
 import { MerchantACHBankAccount } from './account/ACHBankAccount'
 import { BusinessOwner } from './account/businessOwner'
-import { Merchant } from './account/merchant'
+import { IMerchant, Merchant } from './account/merchant'
 import { MerchantAccount } from './account/merchantAccount'
 import { MicroDeposit } from './account/microdeposit'
 import { Terms } from './account/terms'
@@ -33,7 +33,7 @@ const MERCHANT_BANK_ACC_PATH = {
 }
 const SEPARATOR = '/'
 
-type BankAccountTypes = MerchantACHBankAccount
+// type BankAccountTypes = MerchantACHBankAccount
 
 /**
  * Account Management API
@@ -43,7 +43,7 @@ type BankAccountTypes = MerchantACHBankAccount
  * @see https://developer.paysafe.com/en/rest-apis/platforms/account-management/getting-started/introduction-to-account-management/
  */
 export class MerchantServiceHandler extends GenericServiceHandler {
-  async createMerchant(merchant: Merchant): Promise<Merchant> {
+  async createMerchant(merchant: Merchant | IMerchant): Promise<Merchant> {
     const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_PATH), constants.POST)
     const response = await this.request(requestObj, merchant)
     return new Merchant(response)

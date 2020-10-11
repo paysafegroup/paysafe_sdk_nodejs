@@ -1,10 +1,17 @@
-import { GenericLinkedObject } from '../generic-linked-object'
+import { GenericLinkedObject, IGenericLinkedObject } from '../generic-linked-object'
+
+export type MicroDepositStatus = 'SENT' | 'ERROR' | 'FAILED' | 'VALIDATED' | 'INVALID' | 'TXN_ERROR' | 'TXN_FAILED'
+
+export interface IMicroDeposit extends IGenericLinkedObject {
+  amount?: number
+  status?: MicroDepositStatus
+}
 
 export class MicroDeposit extends GenericLinkedObject {
-  public amount: string
-  public status: string
+  public amount?: number
+  public status?: MicroDepositStatus
 
-  constructor(resp) {
+  constructor(resp?: IMicroDeposit) {
     super(resp)
 
     if (resp) {
@@ -17,7 +24,7 @@ export class MicroDeposit extends GenericLinkedObject {
     }
   }
 
-  setAmount(amount) {
+  setAmount(amount: number) {
     this.amount = amount
   }
 
@@ -25,7 +32,7 @@ export class MicroDeposit extends GenericLinkedObject {
     return this.amount
   }
 
-  setStatus(status) {
+  setStatus(status: MicroDepositStatus) {
     this.status = status
   }
 

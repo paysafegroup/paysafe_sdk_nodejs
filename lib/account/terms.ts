@@ -1,10 +1,15 @@
-import { GenericLinkedObject } from '../generic-linked-object'
+import { GenericLinkedObject, IGenericLinkedObject } from '../generic-linked-object'
+
+export interface ITerms extends IGenericLinkedObject {
+  version?: string
+  acceptanceDate?: string
+}
 
 export class Terms extends GenericLinkedObject {
-  public version: string
-  public acceptanceDate: string
+  public version?: string
+  public acceptanceDate?: string
 
-  constructor(resp) {
+  constructor(resp?: ITerms) {
     super(resp)
 
     if (resp) {
@@ -17,7 +22,7 @@ export class Terms extends GenericLinkedObject {
     }
   }
 
-  setVersion(version) {
+  setVersion(version: string) {
     this.version = version
   }
 
@@ -25,7 +30,7 @@ export class Terms extends GenericLinkedObject {
     return this.version
   }
 
-  setAcceptanceDate(acceptanceDate) {
+  setAcceptanceDate(acceptanceDate: string) {
     this.acceptanceDate = acceptanceDate
   }
 

@@ -1,6 +1,18 @@
 import { Address } from '../customervault/address'
 import { DateOfBirth } from '../customervault/dateofbirth'
-import { GenericLinkedObject } from '../generic-linked-object'
+import { GenericLinkedObject, IGenericLinkedObject } from '../generic-linked-object'
+
+export interface IBusinessOwner extends IGenericLinkedObject {
+  firstName?: string
+  middleName?: string
+  lastName?: string
+  jobTitle?: string
+  phone?: string
+  email?: string
+  ssn?: string
+  dateOfBirth?: DateOfBirth
+  currentAddress?: Address
+}
 
 export class BusinessOwner extends GenericLinkedObject {
   firstName: string
@@ -13,7 +25,7 @@ export class BusinessOwner extends GenericLinkedObject {
   dateOfBirth: DateOfBirth
   currentAddress: Address
 
-  constructor(resp: any) {
+  constructor(resp?: IBusinessOwner) {
     super(resp)
 
     if (resp) {
@@ -49,16 +61,12 @@ export class BusinessOwner extends GenericLinkedObject {
       }
       // Required
       if (resp.currentAddress) {
-        if (resp.currentAddress instanceof Array) {
-          this.currentAddress = resp.currentAddress.map((address) => new Address(address))
-        } else {
-          this.currentAddress = resp.currentAddress
-        }
+        this.currentAddress = resp.currentAddress
       }
     }
   }
 
-  setFirstName(firstName) {
+  setFirstName(firstName: string) {
     this.firstName = firstName
   }
 
@@ -66,7 +74,7 @@ export class BusinessOwner extends GenericLinkedObject {
     return this.firstName
   }
 
-  setMiddleName(middleName) {
+  setMiddleName(middleName: string) {
     this.middleName = middleName
   }
 
@@ -74,7 +82,7 @@ export class BusinessOwner extends GenericLinkedObject {
     return this.middleName
   }
 
-  setLastName(lastName) {
+  setLastName(lastName: string) {
     this.lastName = lastName
   }
 
@@ -82,7 +90,7 @@ export class BusinessOwner extends GenericLinkedObject {
     return this.lastName
   }
 
-  setEmail(email) {
+  setEmail(email: string) {
     this.email = email
   }
 
@@ -90,7 +98,7 @@ export class BusinessOwner extends GenericLinkedObject {
     return this.email
   }
 
-  setJobTitle(jobTitle) {
+  setJobTitle(jobTitle: string) {
     this.jobTitle = jobTitle
   }
 
@@ -98,7 +106,7 @@ export class BusinessOwner extends GenericLinkedObject {
     return this.jobTitle
   }
 
-  setPhone(phone) {
+  setPhone(phone: string) {
     this.phone = phone
   }
 
@@ -106,15 +114,15 @@ export class BusinessOwner extends GenericLinkedObject {
     return this.phone
   }
 
-  setSsn(ssn) {
+  setSSN(ssn: string) {
     this.ssn = ssn
   }
 
-  getSsn() {
+  getSSN() {
     return this.ssn
   }
 
-  setDateOfBirth(dateOfBirth) {
+  setDateOfBirth(dateOfBirth: DateOfBirth) {
     this.dateOfBirth = dateOfBirth
   }
 
@@ -122,7 +130,7 @@ export class BusinessOwner extends GenericLinkedObject {
     return this.dateOfBirth
   }
 
-  setCurrentAddress(currentAddress) {
+  setCurrentAddress(currentAddress: Address) {
     this.currentAddress = currentAddress
   }
 

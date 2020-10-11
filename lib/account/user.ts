@@ -35,7 +35,7 @@ export class User extends GenericLinkedObject {
     }
   }
 
-  setUserName(userName) {
+  setUserName(userName: string) {
     this.userName = userName
   }
 
@@ -43,7 +43,7 @@ export class User extends GenericLinkedObject {
     return this.userName
   }
 
-  setPassword(password) {
+  setPassword(password: string) {
     this.password = password
   }
 
@@ -51,7 +51,7 @@ export class User extends GenericLinkedObject {
     return this.password
   }
 
-  setEmail(email) {
+  setEmail(email: string) {
     this.email = email
   }
 
@@ -59,7 +59,7 @@ export class User extends GenericLinkedObject {
     return this.email
   }
 
-  setRecoveryQuestion(recoveryQuestion) {
+  setRecoveryQuestion(recoveryQuestion: RecoveryQuestion) {
     this.recoveryQuestion = recoveryQuestion
   }
 

@@ -134,36 +134,32 @@ export class Paysafe {
 
   private api: PaysafeAPIDetails
 
-  constructor(apiKey, apiPassword, environment: 'LIVE' | 'TEST' | 'LOCALTEST' | 'SBOXTEST', accountNumber) {
-    try {
-      const env: Environment.Environment = Environment[environment]
-      if (apiKey && apiPassword && environment && accountNumber && env) {
-        this.api = {
-          key: apiKey,
-          password: apiPassword,
-          environment: env,
-          accountNumber,
-        }
-
-        // Services
-        this.merchantService = new MerchantServiceHandler(this.api)
-        this.cardService = new CardServiceHandler(this.api)
-        this.customerService = new CustomerServiceHandler(this.api)
-        this.directDebitService = new DirectDebitServiceHandler(this.api)
-        this.threeDsecureService = new ThreeDsecureServiceHandler(this.api)
-      } else if (!apiKey) {
-        throw new Error('Please provide API key!')
-      } else if (!apiPassword) {
-        throw new Error('Please provide API password!')
-      } else if (!environment) {
-        throw new Error("Please provide Environment string i.e 'TEST' or 'LIVE'!")
-      } else if (!env) {
-        throw new Error("Environment string must be 'TEST' or 'LIVE'!")
-      } else if (!accountNumber) {
-        throw new Error('Please provide Merchant Account Number!')
+  constructor(apiKey, apiPassword, environment: 'LIVE' | 'TEST' | 'LOCALTEST' | 'SBOXTEST', accountNumber: string) {
+    const env: Environment.Environment = Environment[environment]
+    if (apiKey && apiPassword && environment && accountNumber && env) {
+      this.api = {
+        key: apiKey,
+        password: apiPassword,
+        environment: env,
+        accountNumber,
       }
-    } catch (error) {
-      console.error(error)
+
+      // Services
+      this.merchantService = new MerchantServiceHandler(this.api)
+      this.cardService = new CardServiceHandler(this.api)
+      this.customerService = new CustomerServiceHandler(this.api)
+      this.directDebitService = new DirectDebitServiceHandler(this.api)
+      this.threeDsecureService = new ThreeDsecureServiceHandler(this.api)
+    } else if (!apiKey) {
+      throw new Error('Please provide API key!')
+    } else if (!apiPassword) {
+      throw new Error('Please provide API password!')
+    } else if (!environment) {
+      throw new Error("Please provide Environment string i.e 'TEST' or 'LIVE'!")
+    } else if (!env) {
+      throw new Error("Environment string must be 'TEST' or 'LIVE'!")
+    } else if (!accountNumber) {
+      throw new Error('Please provide Merchant Account Number!')
     }
   }
 

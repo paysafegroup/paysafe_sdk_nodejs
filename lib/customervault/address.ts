@@ -1,5 +1,20 @@
-import { GenericObject } from '../generic'
+import { GenericObject, IGenericObject } from '../generic'
 import { Profile } from './profile'
+
+export interface IAddress extends IGenericObject {
+  nickName?: string
+  street?: string
+  street2?: string
+  city?: string
+  country?: string
+  state?: string
+  zip?: string
+  recipientName?: string
+  phone?: string
+  profile?: Profile
+  status?: string
+  defaultShippingAddressIndicator?: string
+}
 
 export class Address extends GenericObject {
   nickName: string
@@ -15,7 +30,7 @@ export class Address extends GenericObject {
   status: string
   defaultShippingAddressIndicator: string
 
-  constructor(resp) {
+  constructor(resp?: IAddress) {
     super(resp)
 
     if (resp) {
