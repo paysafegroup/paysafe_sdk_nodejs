@@ -52,7 +52,7 @@ export class Profile extends GenericObject {
   bacsbankaccounts: BACSBankAccount[]
   sepabankaccounts: SEPABankAccount[]
 
-  constructor(resp) {
+  constructor(resp?: IProfile) {
     super(resp)
     if (resp) {
       if (resp.status) {
@@ -99,7 +99,7 @@ export class Profile extends GenericObject {
       }
       if (resp.addresses) {
         if (resp.addresses instanceof Array) {
-          this.addresses = new resp.addresses.map((address) => new Address(address))
+          this.addresses = resp.addresses.map((address) => new Address(address))
         } else {
           this.addresses = resp.addresses
         }
