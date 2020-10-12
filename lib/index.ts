@@ -17,11 +17,11 @@ import { Authentication } from './cardpayments/authentication'
 import { Authorization } from './cardpayments/authorization'
 import { AuthorizationReversal } from './cardpayments/authorizationreversal'
 import { BillingDetails } from './cardpayments/billingDetails'
-import { Card } from './cardpayments/card'
-import { CardExpiry } from './cardpayments/cardExpiry'
+import { Card, ICard } from './cardpayments/card'
+import { CardExpiry, ICardExpiry } from './cardpayments/cardExpiry'
 import { MasterPass } from './cardpayments/masterPass'
 import { Pagination } from './cardpayments/pagination'
-import { Refund } from './cardpayments/refund'
+import { Refund, RefundStatus } from './cardpayments/refund'
 import { Settlement } from './cardpayments/settlement'
 import { ShippingDetails } from './cardpayments/shippingDetails'
 import { Verification } from './cardpayments/verification'
@@ -56,18 +56,18 @@ export {
   RecoveryQuestion,
   BusinessOwner,
   Terms, ITerms,
-  Card,
+  Card, ICard,
   AccordD,
   Authentication,
   Authorization,
   AuthorizationReversal,
   BillingDetails,
-  CardExpiry,
+  CardExpiry, ICardExpiry,
   MasterPass,
   MerchantDescriptor,
   Pagination,
   // RecipientDateOfBirth,
-  Refund,
+  Refund, RefundStatus,
   Settlement,
   ShippingDetails,
   Verification,
@@ -84,6 +84,8 @@ export {
   StandaloneCredit,
   EnrollmentCheck,
 }
+
+export { PaysafeError as Error }
 
 export class Paysafe {
   Merchant = Merchant
