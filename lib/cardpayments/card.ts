@@ -3,18 +3,24 @@ import { GenericObject, IGenericObject } from '../generic'
 import { BillingDetails, IBillingDetails } from './billingDetails'
 import { CardExpiry, ICardExpiry } from './cardExpiry'
 
+export type CardStatus = 'ACTIVE' | string
 export type CardType = 'AM' | 'DI' | 'JC' | 'MC' | 'MD' | 'SO' | 'VI' | 'VD' | 'VE'
+export type CardCategory = 'CREDIT' | 'DEBIT' | 'PREPAID' | 'UNKNOWN'
+export type CardStoredCredentialTokenStatus = 'UNVERIFIED' | string
 
 export interface ICard extends IGenericObject {
+  // cardBin is sometimes given
   singleUseToken?: string
   nickName?: string
   merchantRefNum?: string
   holderName?: string
   billingAddressId?: string
   billingDetails?: BillingDetails | IBillingDetails
-  defaultCardIndicator?: string
+  defaultCardIndicator?: boolean
   paymentToken?: string
+  storedCredentialTokenStatus?: CardStoredCredentialTokenStatus
   cardNum?: string
+  cardCategory?: CardCategory
   type?: CardType
   lastDigits?: string
   cardExpiry?: CardExpiry | ICardExpiry
@@ -22,7 +28,7 @@ export interface ICard extends IGenericObject {
   track1?: string
   track2?: string
   profile?: Profile | IProfile
-  status?: string
+  status?: CardStatus
 }
 
 /**
@@ -35,9 +41,11 @@ export class Card extends GenericObject {
   holderName: string
   billingAddressId: string
   billingDetails: BillingDetails
-  defaultCardIndicator: string
+  defaultCardIndicator: boolean
   paymentToken: string
+  storedCredentialTokenStatus?: CardStoredCredentialTokenStatus
   cardNum: string
+  cardCategory?: CardCategory
   type: CardType
   lastDigits: string
   cardExpiry: CardExpiry
@@ -45,7 +53,7 @@ export class Card extends GenericObject {
   track1: string
   track2: string
   profile?: Profile
-  status: string
+  status: CardStatus
 
   constructor(resp?: ICard) {
     super(resp)
@@ -72,17 +80,29 @@ export class Card extends GenericObject {
         this.billingDetails = new BillingDetails(resp.billingDetails)
         // }
       }
-      if (resp.defaultCardIndicator !== undefined) {
+      if (typeof resp.defaultCardIndicator !== 'undefined') {
         this.defaultCardIndicator = resp.defaultCardIndicator
       }
       if (resp.paymentToken) {
         this.paymentToken = resp.paymentToken
       }
+      if (resp.paymentToken) {
+        this.storedCredentialTokenStatus = resp.storedCredentialTokenStatus
+      }
       if (resp.cardNum) {
         this.cardNum = resp.cardNum
       }
+      if (resp.cardCategory) {
+        this.cardCategory = resp.cardCategory
+      }
       if (resp.type) {
         this.type = resp.type
+      } else if ((resp as any).cardType) {
+        /**
+         * the card object given back from the Vault uses cardType instead of type
+         * @see https://developer.paysafe.com/en/rest-apis/vault/typical-api-calls/add-a-card-to-a-profile/
+         */
+        this.type = (resp as any).cardType
       }
       if (resp.lastDigits) {
         this.lastDigits = resp.lastDigits
@@ -116,7 +136,7 @@ export class Card extends GenericObject {
     return this.singleUseToken
   }
 
-  setStatus(status) {
+  setStatus(status: CardStatus) {
     this.status = status
   }
 
@@ -132,7 +152,7 @@ export class Card extends GenericObject {
     return this.profile
   }
 
-  setDefaultCardIndicator(defaultCardIndicator) {
+  setDefaultCardIndicator(defaultCardIndicator: boolean) {
     this.defaultCardIndicator = defaultCardIndicator
   }
 
@@ -188,12 +208,28 @@ export class Card extends GenericObject {
     return this.paymentToken
   }
 
+  setStoredCredentialTokenStatus(storedCredentialTokenStatus: string) {
+    this.storedCredentialTokenStatus = storedCredentialTokenStatus
+  }
+
+  getStoredCredentialTokenStatus() {
+    return this.storedCredentialTokenStatus
+  }
+
   setCardNum(cardNum: string) {
     this.cardNum = cardNum
   }
 
   getCardNum() {
     return this.cardNum
+  }
+
+  setCardCategory(cardCategory: CardCategory) {
+    this.cardCategory = cardCategory
+  }
+
+  getCardCategory() {
+    return this.cardCategory
   }
 
   setType(type: CardType) {
