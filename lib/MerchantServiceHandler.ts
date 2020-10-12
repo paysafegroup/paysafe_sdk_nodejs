@@ -324,10 +324,14 @@ export class MerchantServiceHandler extends GenericServiceHandler {
   /**
    * Method for looking up Merchant Terms and Conditions as HTML
    */
-  async getMerchantTermsAndConditions(): Promise<string> {
+  async getMerchantTermsAndConditions(): Promise<{ version: string, text: string }> {
     const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_TC_PATH), constants.GET)
-    const response = await this.request(requestObj, null)
-    return response
+    const request = await this.rawRequest(requestObj, null)
+
+    return {
+      version: request.response.headers['x_terms_version'] as string,
+      text: request.body,
+    }
   }
 
   /**

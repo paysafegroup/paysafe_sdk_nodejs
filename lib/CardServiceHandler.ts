@@ -171,9 +171,9 @@ export class CardServiceHandler extends GenericServiceHandler {
     if (auth && auth.id) {
       const authId = auth.id
       delete auth.id
-      const PaysafeRequestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
+      const requestObj = new PaysafeMethod(prepareURI(AUTH_PATH + authId, this.api.accountNumber),
         constants.GET)
-      const response = await this.request(PaysafeRequestObj, null)
+      const response = await this.request(requestObj, null)
       return new Authorization(response)
     } else {
       throw this.exception('Auth id is missing in CardServiceHandler.getAuth')
