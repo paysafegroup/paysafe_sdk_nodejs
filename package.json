@@ -1,6 +1,6 @@
 {
   "name": "node-paysafe",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Typescript-friendly SDK for Paysafe",
   "keywords": [
     "paysafe"
