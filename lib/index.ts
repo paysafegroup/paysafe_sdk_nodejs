@@ -165,11 +165,17 @@ export class Paysafe {
     }
   }
 
+  enabledDebugging() {
+    this.api.debugging = true
+    return this
+  }
+
   error(code: string, message: string) {
     return new PaysafeError({ code, message })
   }
 
   updateConfig(host: string, maxSockets: number, timeout: number) {
     this.api.environment = Environment.createEnv(host, maxSockets, timeout)
+    return this
   }
 }

@@ -32,8 +32,14 @@ export class GenericServiceHandler {
   constructor(protected api: PaysafeAPIDetails) {
   }
 
+  protected debug(message: string) {
+    if (this.api.debugging) {
+      (console as any).log(message)
+    }
+  }
+
   protected exception(message: string) {
-    return PaysafeError.generate(400, `InvalidRequestException: ${message}`)
+    return PaysafeError.generate('400', `InvalidRequestException: ${message}`)
   }
 
   protected prepareApiCredential(apiKey = this.api.key, apiPassword = this.api.password): string {
@@ -46,7 +52,7 @@ export class GenericServiceHandler {
     const request = await this.rawRequest(method, requestObject)
 
     if (request.response.statusCode === 503) {
-      throw PaysafeError.generate(503, request.body)
+      throw PaysafeError.generate(String(request.response.statusCode), request.body)
     }
 
     // if we had no body provided, this was most likely a delete request which returns nothing
@@ -99,13 +105,15 @@ export class GenericServiceHandler {
       body = JSON.stringify(requestObject)
     }
 
+    this.debug(`request [${method.apiUrl}]: ${body}`)
+
     return new Promise((resolve, reject) => {
       const req = httpsRequest(options, (res) => {
         res.setEncoding('utf8')
         let data = ''
 
         res.on('error', (err: Error) => {
-          reject(PaysafeError.generate(500, `Connection error: ${err.message}`))
+          reject(PaysafeError.generate('500', `Connection error: ${err.message}`))
         })
 
         res.on('data', (chunk) => {
@@ -113,6 +121,9 @@ export class GenericServiceHandler {
         })
 
         res.on('end', () => {
+          this.debug(`response[${method.apiUrl}]: ${res.statusCode} ${res.statusMessage}`)
+          this.debug(`response[${method.apiUrl}]: ${data}`)
+
           resolve({
             response: res,
             body: data,

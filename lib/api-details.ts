@@ -5,4 +5,5 @@ export interface PaysafeAPIDetails {
   password: string
   environment: Environment
   accountNumber: string
+  debugging?: boolean
 }

@@ -9,11 +9,11 @@ export interface IError {
   details?: string
 }
 
-export class PaysafeError implements IError {
+export class PaysafeError extends Error implements IError {
   /**
    * Helper factory which takes raw paysafe errors and outputs wrapping instances
    */
-  static generate(code, message) {
+  static generate(code: string, message: string) {
     return new PaysafeError({
       code,
       message,
@@ -21,12 +21,14 @@ export class PaysafeError implements IError {
   }
 
   code?: string
-  message?: string
+  message: string
   links?: Link[]
   fieldErrors?: FieldError[]
   details?: string
 
   constructor(resp?: IError) {
+    super()
+
     if (resp) {
       if (resp.code) {
         this.code = resp.code
