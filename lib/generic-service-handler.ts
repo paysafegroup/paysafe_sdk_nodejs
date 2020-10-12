@@ -53,16 +53,18 @@ export class GenericServiceHandler {
     if (!request.body) {
       return { status: request.response.statusCode }
     } else {
-      try {
-        const response = deSerializeObject(request.body)
+      let response: any
 
-        if (response.error) {
-          throw new PaysafeError(response.error)
-        } else {
-          return response
-        }
+      try {
+        response = deSerializeObject(request.body)
       } catch (error) {
         throw PaysafeError.generate(error.code || 500, 'Failed to parse body')
+      }
+
+      if (response && response.error) {
+        throw new PaysafeError(response.error)
+      } else {
+        return response
       }
     }
   }
