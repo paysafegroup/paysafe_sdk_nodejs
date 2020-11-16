@@ -144,6 +144,7 @@ export class Paysafe {
         password: apiPassword,
         environment: env,
         accountNumber,
+        debugging: environment !== 'LIVE',
       }
 
       // Services

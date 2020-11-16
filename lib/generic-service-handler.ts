@@ -105,7 +105,7 @@ export class GenericServiceHandler {
       body = JSON.stringify(requestObject)
     }
 
-    this.debug(`request [${method.apiUrl}]: ${body}`)
+    this.debug(`PaySafe Request [${method.method} ${method.apiUrl}]: ${body ? '\n' + body : ''}`)
 
     return new Promise((resolve, reject) => {
       const req = httpsRequest(options, (res) => {
@@ -121,8 +121,7 @@ export class GenericServiceHandler {
         })
 
         res.on('end', () => {
-          this.debug(`response[${method.apiUrl}]: ${res.statusCode} ${res.statusMessage}`)
-          this.debug(`response[${method.apiUrl}]: ${data}`)
+          this.debug(`PaySafe Response [${method.method} ${method.apiUrl}]: ${res.statusCode} ${res.statusMessage}\n${data}`)
 
           resolve({
             response: res,
