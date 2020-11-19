@@ -183,7 +183,7 @@ export class MerchantServiceHandler extends GenericServiceHandler {
    */
   async activateMerchantAccount(): Promise<any> {
     const requestObj = new PaysafeMethod(this.prepareMerchantAccountURI(MERCHANT_ACTIVATION_PATH), constants.POST)
-    const response = await this.request(requestObj, {})
+    const response = await this.request(requestObj, { })
     return response
   }
 
@@ -294,7 +294,7 @@ export class MerchantServiceHandler extends GenericServiceHandler {
   async createMerchantMicroDeposit(bankAccount: MerchantACHBankAccount): Promise<MicroDeposit> {
     const uri = this.prepareURI(MERCHANT_BANK_ACC_PATH[bankAccount.type] + SEPARATOR + bankAccount.id + MERCHANT_MICRODEPOSIT_PATH)
     const requestObj = new PaysafeMethod(uri, constants.POST)
-    const response = await this.request(requestObj, {})
+    const response = await this.request(requestObj, { })
     return new MicroDeposit(response)
   }
 
