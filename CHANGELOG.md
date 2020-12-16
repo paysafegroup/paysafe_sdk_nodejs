@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.0.1...v1.1.0) (2020-12-16)
+
+
+### Features
+
+* get customerprofile by merchantcustomerid ([49a43b4](https://github.com/gettilled/paysafe_sdk_nodejs/commit/49a43b4bf148ab0e474be8484bc67cab67c91df4))
+
 ## [1.0.1](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.0.0...v1.0.1) (2020-11-23)
 
 
