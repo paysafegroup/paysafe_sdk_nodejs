@@ -41,13 +41,17 @@ export class CustomerServiceHandler extends GenericServiceHandler {
   }
 
   async getCustomerProfile(profile: Profile): Promise<Profile> {
+    let path: string
     if (profile && profile.id) {
-      const requestObj = new PaysafeMethod(prepareURI(PROFILE_PATH + profile.id), constants.GET)
-      const response = await this.request(requestObj, null)
-      return new Profile(response)
+      path = PROFILE_PATH + profile.id
+    } else if (profile && profile.merchantCustomerId) {
+      path = PROFILE_PATH + '?merchantCustomerId=' + profile.merchantCustomerId
     } else {
-      throw this.exception('profile id is missing in CustomerServiceHandler.getCustomerProfile')
+      throw this.exception('profile id and merchantCustomerId is missing in CustomerServiceHandler.getCustomerProfile')
     }
+    const requestObj = new PaysafeMethod(prepareURI(path), constants.GET)
+    const response = await this.request(requestObj, null)
+    return new Profile(response)
   }
 
   async deleteCustomerProfile(profile: Profile): Promise<Profile> {
