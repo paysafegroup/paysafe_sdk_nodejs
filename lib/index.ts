@@ -14,7 +14,7 @@ import { User } from './account/user'
 import { PaysafeAPIDetails } from './api-details'
 import { AccordD } from './cardpayments/accordD'
 import { Authentication } from './cardpayments/authentication'
-import { Authorization } from './cardpayments/authorization'
+import { Authorization, AuthorizationStatus, AVSResponse, CvvVerification, Recurring } from './cardpayments/authorization'
 import { AuthorizationReversal } from './cardpayments/authorizationreversal'
 import { BillingDetails } from './cardpayments/billingDetails'
 import { Card, ICard } from './cardpayments/card'
@@ -60,6 +60,10 @@ export {
   AccordD,
   Authentication,
   Authorization,
+  AuthorizationStatus,
+  CvvVerification,
+  AVSResponse,
+  Recurring,
   AuthorizationReversal,
   BillingDetails,
   CardExpiry, ICardExpiry,
