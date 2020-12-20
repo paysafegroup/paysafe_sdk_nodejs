@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.1.0...v1.1.1) (2020-12-20)
+
+
+### Bug Fixes
+
+* export authorization types ([dc2658b](https://github.com/gettilled/paysafe_sdk_nodejs/commit/dc2658b1ed4bd8b76b7830560766615601f436ac))
+
 # [1.1.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.0.1...v1.1.0) (2020-12-16)
 
 
