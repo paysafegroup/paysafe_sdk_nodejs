@@ -1,7 +1,7 @@
 import * as Environment from '../bin/environment'
-import { MerchantACHBankAccount } from './account/ACHBankAccount'
+import { IMerchantACHBankAccount, MerchantACHBankAccount } from './account/ACHBankAccount'
 import { MerchantBACSBankAccount } from './account/BACSBankAccount'
-import { BusinessOwner } from './account/businessOwner'
+import { BusinessOwner, IBusinessOwner } from './account/businessOwner'
 import { MerchantEFTBankAccount } from './account/EFTBankAccount'
 import { IMerchant, Merchant } from './account/merchant'
 import { IMerchantAccount, MerchantAccount } from './account/merchantAccount'
@@ -30,9 +30,9 @@ import { CardServiceHandler } from './CardServiceHandler'
 import { PaysafeError } from './common/error'
 import { CustomerServiceHandler } from './CustomerServiceHandler'
 import { ACHBankAccount } from './customervault/ACHBankAccount'
-import { Address } from './customervault/address'
+import { Address, IAddress } from './customervault/address'
 import { BACSBankAccount } from './customervault/BACSBankAccount'
-import { DateOfBirth } from './customervault/dateofbirth'
+import { DateOfBirth, IDateOfBirth } from './customervault/dateofbirth'
 import { EFTBankAccount } from './customervault/EFTBankAccount'
 import { Mandate } from './customervault/mandate'
 import { Profile } from './customervault/profile'
@@ -47,14 +47,14 @@ import { ThreeDsecureServiceHandler } from './ThreeDsecureServiceHandler'
 export {
   Merchant, IMerchant,
   MerchantAccount, IMerchantAccount,
-  MerchantACHBankAccount,
+  MerchantACHBankAccount, IMerchantACHBankAccount,
   MerchantBACSBankAccount,
   MerchantEFTBankAccount,
   MerchantSEPABankAccount,
   MicroDeposit,
   User,
   RecoveryQuestion,
-  BusinessOwner,
+  BusinessOwner, IBusinessOwner,
   Terms, ITerms,
   Card, ICard,
   AccordD,
@@ -76,8 +76,8 @@ export {
   ShippingDetails,
   Verification,
   VisaAdditionalAuthData,
-  Address,
-  DateOfBirth,
+  Address, IAddress,
+  DateOfBirth, IDateOfBirth,
   Profile,
   ACHBankAccount,
   BACSBankAccount,
