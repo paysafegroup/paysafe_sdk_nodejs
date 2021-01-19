@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.1.1...v1.1.2) (2021-01-19)
+
+
+### Bug Fixes
+
+* export additional interfaces ([71f3652](https://github.com/gettilled/paysafe_sdk_nodejs/commit/71f365224ad293ee84800514f8bf391cca915d7e))
+
 ## [1.1.1](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.1.0...v1.1.1) (2020-12-20)
 
 
