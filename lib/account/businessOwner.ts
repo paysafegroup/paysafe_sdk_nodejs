@@ -10,8 +10,13 @@ export interface IBusinessOwner extends IGenericLinkedObject {
   phone?: string
   email?: string
   ssn?: string
-  dateOfBirth?: DateOfBirth
-  currentAddress?: Address
+  dateOfBirth?: DateOfBirth // TODO: IDateOfBirth
+  currentAddress?: Address // TODO: IAddress
+  nationality?: string
+  isApplicant?: boolean
+  isControlProng?: boolean
+  gender?: string // 'M' or 'F'
+  percentageOwnership?: number
 }
 
 export class BusinessOwner extends GenericLinkedObject {
@@ -24,6 +29,11 @@ export class BusinessOwner extends GenericLinkedObject {
   ssn: string
   dateOfBirth: DateOfBirth
   currentAddress: Address
+  nationality: string
+  isApplicant: boolean
+  isControlProng: boolean
+  gender: string
+  percentageOwnership: number
 
   constructor(resp?: IBusinessOwner) {
     super(resp)
@@ -62,6 +72,22 @@ export class BusinessOwner extends GenericLinkedObject {
       // Required
       if (resp.currentAddress) {
         this.currentAddress = resp.currentAddress
+      }
+
+      if (resp.nationality) {
+        this.nationality = resp.nationality
+      }
+      if (resp.isApplicant) {
+        this.isApplicant = resp.isApplicant
+      }
+      if (resp.isControlProng) {
+        this.isControlProng = resp.isControlProng
+      }
+      if (resp.gender) {
+        this.gender = resp.gender
+      }
+      if (resp.percentageOwnership) {
+        this.percentageOwnership = resp.percentageOwnership
       }
     }
   }
@@ -137,4 +163,45 @@ export class BusinessOwner extends GenericLinkedObject {
   getCurrentAddress() {
     return this.currentAddress
   }
+
+  setNationality(nationality: string) {
+    this.nationality = nationality
+  }
+
+  getNationality() {
+    return this.nationality
+  }
+
+  setIsApplicant(isApplicant: boolean) {
+    this.isApplicant = isApplicant
+  }
+
+  getIsApplicant() {
+    return this.isApplicant
+  }
+
+  setIsControlProng(isControlProng: boolean) {
+    this.isControlProng = isControlProng
+  }
+
+  getIsControlProng() {
+    return this.isControlProng
+  }
+
+  setGender(gender: string) {
+    this.gender = gender
+  }
+
+  getGender() {
+    return this.gender
+  }
+
+  setPercentageOwnership(percentageOwnership: number) {
+    this.percentageOwnership = percentageOwnership
+  }
+
+  getPercentageOwnership() {
+    return this.percentageOwnership
+  }
+
 }
