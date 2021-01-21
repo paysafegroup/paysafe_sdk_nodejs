@@ -1,6 +1,15 @@
-import { GenericObject } from '../generic'
+import { GenericLinkedObject, IGenericLinkedObject } from '../generic-linked-object'
 
-export class MerchantEFTBankAccount extends GenericObject {
+export interface IMerchantEFTBankAccount extends IGenericLinkedObject {
+  status?: string // Not a response value...
+  statusReason?: string // Not a response value...
+  accountNumber?: string
+  transitNumber?: string
+  institutionId?: string
+}
+
+
+export class MerchantEFTBankAccount extends GenericLinkedObject {
   // type: string
   status: string
   statusReason: string
@@ -8,7 +17,7 @@ export class MerchantEFTBankAccount extends GenericObject {
   transitNumber: string
   institutionId: string
 
-  constructor(resp) {
+  constructor(resp?: IMerchantEFTBankAccount) {
     super(resp)
 
     if (resp) {

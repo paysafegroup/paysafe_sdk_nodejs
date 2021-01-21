@@ -2,15 +2,15 @@ import * as Environment from '../bin/environment'
 import { IMerchantACHBankAccount, MerchantACHBankAccount } from './account/ACHBankAccount'
 import { MerchantBACSBankAccount } from './account/BACSBankAccount'
 import { BusinessOwner, IBusinessOwner } from './account/businessOwner'
-import { MerchantEFTBankAccount } from './account/EFTBankAccount'
+import { IMerchantEFTBankAccount, MerchantEFTBankAccount } from './account/EFTBankAccount'
 import { IMerchant, Merchant } from './account/merchant'
 import { IMerchantAccount, MerchantAccount } from './account/merchantAccount'
 import { MerchantDescriptor } from './account/merchantDescriptor'
-import { MicroDeposit } from './account/microdeposit'
+import { IMicroDeposit, MicroDeposit } from './account/microdeposit'
 import { RecoveryQuestion } from './account/recoveryQuestion'
 import { MerchantSEPABankAccount } from './account/SEPABankAccount'
 import { ITerms, Terms } from './account/terms'
-import { User } from './account/user'
+import { IUser, User } from './account/user'
 import { PaysafeAPIDetails } from './api-details'
 import { AccordD } from './cardpayments/accordD'
 import { Authentication } from './cardpayments/authentication'
@@ -49,10 +49,10 @@ export {
   MerchantAccount, IMerchantAccount,
   MerchantACHBankAccount, IMerchantACHBankAccount,
   MerchantBACSBankAccount,
-  MerchantEFTBankAccount,
+  MerchantEFTBankAccount, IMerchantEFTBankAccount,
   MerchantSEPABankAccount,
-  MicroDeposit,
-  User,
+  MicroDeposit, IMicroDeposit,
+  User, IUser,
   RecoveryQuestion,
   BusinessOwner, IBusinessOwner,
   Terms, ITerms,

@@ -1,5 +1,6 @@
 import { MerchantACHBankAccount } from './account/ACHBankAccount'
 import { BusinessOwner } from './account/businessOwner'
+import { MerchantEFTBankAccount } from './account/EFTBankAccount'
 import { IMerchant, Merchant } from './account/merchant'
 import { MerchantAccount } from './account/merchantAccount'
 import { MicroDeposit } from './account/microdeposit'
@@ -275,6 +276,45 @@ export class MerchantServiceHandler extends GenericServiceHandler {
       return response
     } else {
       throw this.exception('account id is missing in MerchantServiceHandler.deleteMerchantBankAccount')
+    }
+  }
+
+  /**
+   * Method for getting a Merchant EFT Bank Account
+   */
+  async getMerchantEFTBankAccount(bankAccount: MerchantEFTBankAccount): Promise<MerchantEFTBankAccount> {
+
+    if (bankAccount && bankAccount.id) {
+      const requestObj = new PaysafeMethod(this.prepareURI(MERCHANT_BANK_ACC_PATH['EFT'] + '/' + bankAccount.id),
+        constants.GET)
+      const response = await this.request(requestObj, null)
+      return new MerchantEFTBankAccount(response)
+    } else {
+      throw this.exception('bankAccount id is missing in MerchantServiceHandler.getMerchantEFTBankAccount')
+    }
+  }
+
+  /**
+   * Method for creating a Merchant EFT Bank Account
+   */
+  async createMerchantEFTBankAccount(bankAccount: MerchantEFTBankAccount): Promise<MerchantEFTBankAccount> {
+    const uri = this.prepareMerchantAccountURI(MERCHANT_BANK_ACC_PATH['EFT'])
+    const requestObj = new PaysafeMethod(uri, constants.POST)
+    const response = await this.request(requestObj, bankAccount)
+    return new MerchantEFTBankAccount(response)
+  }
+
+  /**
+   * Method for updating a Merchant EFT Bank Account
+   */
+  async updateMerchantEFTBankAccount(bankAccount: MerchantEFTBankAccount): Promise<MerchantEFTBankAccount> {
+    if (bankAccount && bankAccount.id) {
+      const uri = this.prepareURI(MERCHANT_BANK_ACC_PATH['EFT'] + '/' + bankAccount.id)
+      const requestObj = new PaysafeMethod(uri, constants.PUT)
+      const response = await this.request(requestObj, bankAccount)
+      return new MerchantEFTBankAccount(response)
+    } else {
+      throw this.exception('bankaccount id is missing in MerchantServiceHandler.updateMerchantEFTBankAccount')
     }
   }
 

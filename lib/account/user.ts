@@ -1,5 +1,13 @@
-import { GenericLinkedObject } from '../generic-linked-object'
-import { RecoveryQuestion } from './recoveryQuestion'
+import { GenericLinkedObject, IGenericLinkedObject } from '../generic-linked-object'
+import { IRecoveryQuestion, RecoveryQuestion } from './recoveryQuestion'
+
+export interface IUser extends IGenericLinkedObject {
+  userName?: string
+  password?: string
+  email?: string
+  recoveryQuestion?: IRecoveryQuestion
+  users?: any // I don't think this is an actual property...
+}
 
 /**
  * User
@@ -13,7 +21,7 @@ export class User extends GenericLinkedObject {
   recoveryQuestion: RecoveryQuestion
   users: any
 
-  constructor(resp) {
+  constructor(resp: IUser) {
     super(resp)
 
     if (resp) {

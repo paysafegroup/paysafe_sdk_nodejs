@@ -1,14 +1,14 @@
-import { GenericObject, IGenericObject } from '../generic'
+import { GenericLinkedObject, IGenericLinkedObject } from '../generic-linked-object'
 
-export interface IMerchantACHBankAccount extends IGenericObject {
-  type?: string
-  status?: string
-  statusReason?: string
+export interface IMerchantACHBankAccount extends IGenericLinkedObject {
+  type?: string // This is internal only. Not actually returned by Paysafe
+  status?: string // Not a response value...
+  statusReason?: string // Not a response value...
   accountNumber?: string
   routingNumber?: string
 }
 
-export class MerchantACHBankAccount extends GenericObject {
+export class MerchantACHBankAccount extends GenericLinkedObject {
   type: string
   status: string
   statusReason: string
