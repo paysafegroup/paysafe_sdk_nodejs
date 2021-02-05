@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.1.3...v1.2.0) (2021-02-05)
+
+
+### Features
+
+* splitpay ([a59e997](https://github.com/gettilled/paysafe_sdk_nodejs/commit/a59e997497b299e74edd62409331b7c3f98cbb65))
+
 ## [1.1.3](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.1.2...v1.1.3) (2021-01-21)
 
 
