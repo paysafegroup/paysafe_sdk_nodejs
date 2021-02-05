@@ -9,6 +9,7 @@ import { Card } from './card'
 import { MasterPass } from './masterPass'
 import { Settlement } from './settlement'
 import { ShippingDetails } from './shippingDetails'
+import { ISplitPayout, SplitPayout } from './splitPayout'
 import { VisaAdditionalAuthData } from './visaAdditionalAuthData'
 
 export type Recurring = 'INITIAL' | 'RECURRING'
@@ -46,6 +47,7 @@ export interface IAuthorization extends IGenericLinkedObject {
   visaAdditionalAuthData?: VisaAdditionalAuthData
   auths?: (Authorization | IAuthorization)[]
   settlements?: Settlement[]
+  splitpay?: (SplitPayout | ISplitPayout)[]
 }
 
 export class Authorization extends GenericLinkedObject implements IAuthorization {
@@ -78,6 +80,7 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
   visaAdditionalAuthData?: VisaAdditionalAuthData
   auths: Authorization[]
   settlements: Settlement[]
+  splitpay?: SplitPayout[] | ISplitPayout[]
 
   constructor(resp?: IAuthorization) {
     super(resp)
@@ -171,6 +174,9 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
       if (resp.settlements) {
         this.settlements = resp.settlements.map((settlement) => new Settlement(settlement))
       }
+      if (resp.splitpay) {
+        this.splitpay = resp.splitpay.map((splitpayout) => new SplitPayout(splitpayout))
+      }
     }
   }
 
@@ -188,6 +194,14 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
 
   getAuths() {
     return this.auths
+  }
+
+  setSplitpay(splitpay: SplitPayout[]) {
+    this.splitpay = splitpay
+  }
+
+  getSplitpay() {
+    return this.splitpay
   }
 
   setShippingDetails(shippingDetails: ShippingDetails) {

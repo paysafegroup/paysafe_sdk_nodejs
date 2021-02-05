@@ -24,6 +24,7 @@ import { Pagination } from './cardpayments/pagination'
 import { Refund, RefundStatus } from './cardpayments/refund'
 import { Settlement } from './cardpayments/settlement'
 import { ShippingDetails } from './cardpayments/shippingDetails'
+import { ISplitPayout, SplitPayout } from './cardpayments/splitPayout'
 import { Verification } from './cardpayments/verification'
 import { VisaAdditionalAuthData } from './cardpayments/visaAdditionalAuthData'
 import { CardServiceHandler } from './CardServiceHandler'
@@ -87,6 +88,7 @@ export {
   Purchase,
   StandaloneCredit,
   EnrollmentCheck,
+  SplitPayout, ISplitPayout,
 }
 
 export { PaysafeError as Error }
@@ -130,6 +132,7 @@ export class Paysafe {
   Purchase = Purchase
   StandaloneCredit = StandaloneCredit
   EnrollmentCheck = EnrollmentCheck
+  SplitPayout = SplitPayout
   // authentication = require('./threedsecure/authentications')
 
   public merchantService: MerchantServiceHandler
