@@ -1,3 +1,11 @@
+## [1.1.3](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.1.2...v1.1.3) (2021-01-21)
+
+
+### Bug Fixes
+
+* add properties to business owner ([adf51ec](https://github.com/gettilled/paysafe_sdk_nodejs/commit/adf51ec6b0685bb8a1402f9cc417ec960dd12cc5))
+* create and export interfaces; eft bank acct ([bf69520](https://github.com/gettilled/paysafe_sdk_nodejs/commit/bf695205b219f682ed773094c2af81ea33f273d4))
+
 ## [1.1.2](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.1.1...v1.1.2) (2021-01-19)
 
 
