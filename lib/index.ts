@@ -31,6 +31,7 @@ import { CardServiceHandler } from './CardServiceHandler'
 import { PaysafeError } from './common/error'
 import { CustomerServiceHandler } from './CustomerServiceHandler'
 import { ACHBankAccount } from './customervault/ACHBankAccount'
+import { ACHSingleUseToken, IACHSingleUseToken } from './customervault/ACHSingleUseToken'
 import { Address, IAddress } from './customervault/address'
 import { BACSBankAccount } from './customervault/BACSBankAccount'
 import { DateOfBirth, IDateOfBirth } from './customervault/dateofbirth'
@@ -89,6 +90,7 @@ export {
   StandaloneCredit,
   EnrollmentCheck,
   SplitPayout, ISplitPayout,
+  ACHSingleUseToken, IACHSingleUseToken,
 }
 
 export { PaysafeError as Error }
@@ -133,6 +135,7 @@ export class Paysafe {
   StandaloneCredit = StandaloneCredit
   EnrollmentCheck = EnrollmentCheck
   SplitPayout = SplitPayout
+  ACHSingleUseToken = ACHSingleUseToken
   // authentication = require('./threedsecure/authentications')
 
   public merchantService: MerchantServiceHandler

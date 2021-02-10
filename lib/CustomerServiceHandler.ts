@@ -1,6 +1,7 @@
 import { Card } from './cardpayments/card'
 import * as constants from './constants'
 import { ACHBankAccount } from './customervault/ACHBankAccount'
+import { ACHSingleUseToken } from './customervault/ACHSingleUseToken'
 import { Address } from './customervault/address'
 import { BACSBankAccount } from './customervault/BACSBankAccount'
 import { EFTBankAccount } from './customervault/EFTBankAccount'
@@ -22,6 +23,7 @@ const SEPA_BANK_ACC_PATH = '/sepabankaccounts'
 const EFT_BANK_ACC_PATH = '/eftbankaccounts'
 const MANDATES = '/mandates/'
 const SEPARATOR = '/'
+const ACH_SINGLE_USE_TOKENS_PATH = '/achsingleusetokens'
 
 function prepareURI(path: string) {
   return URI + path
@@ -583,4 +585,16 @@ export class CustomerServiceHandler extends GenericServiceHandler {
       throw this.exception('profile id is missing in CustomerServiceHandler.deleteMandates')
     }
   }
+
+  /**
+   * This is how you submit an ACH single-use token creation request. In the response, you will find
+   * a paymentToken value to include with your Direct Debit Purchase. You have to generate a new
+   * single-use token for each ACH transaction you wish to process.
+   */
+  async createACHSingleUseToken(achSingleUseToken: ACHSingleUseToken): Promise<ACHSingleUseToken> {
+    const requestObj = new PaysafeMethod(prepareURI(ACH_SINGLE_USE_TOKENS_PATH), constants.POST)
+    const response = await this.request(requestObj, achSingleUseToken)
+    return new ACHSingleUseToken(response)
+  }
+
 }

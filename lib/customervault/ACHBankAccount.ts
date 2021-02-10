@@ -13,7 +13,7 @@ export class ACHBankAccount extends GenericObject {
   lastDigits: string
   billingAddressId: string
   paymentToken: string
-  payMethod: string
+  payMethod: string // WEB | TEL | PPD | CCD
   paymentDescriptor: string
   profile?: Profile
 
