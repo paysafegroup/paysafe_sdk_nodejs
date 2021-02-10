@@ -27,13 +27,13 @@ export class DirectDebitServiceHandler extends GenericServiceHandler {
    */
   async monitor(): Promise<any> {
     const requestObj = new PaysafeMethod(HEALTH_BEAT_URL, constants.GET)
-    const response = this.request(requestObj)
+    const response = await this.request(requestObj)
     return response
   }
 
   async submitPurchase(purchase: Purchase): Promise<Purchase> {
     const PaysafeReqObj = new PaysafeMethod(prepareURI(PURCHASE_PATH, this.api), constants.POST)
-    const response = this.request(PaysafeReqObj, purchase)
+    const response = await this.request(PaysafeReqObj, purchase)
     return new Purchase(response)
   }
 
@@ -42,7 +42,7 @@ export class DirectDebitServiceHandler extends GenericServiceHandler {
    */
   async getPurchase(purchase: Purchase): Promise<Purchase> {
     const PaysafeReqObj = new PaysafeMethod(prepareURI(PURCHASE_PATH + SEPARATOR + purchase.id, this.api), constants.GET)
-    const response = this.request(PaysafeReqObj, purchase)
+    const response = await this.request(PaysafeReqObj, purchase)
     return new Purchase(response)
   }
 
@@ -53,7 +53,7 @@ export class DirectDebitServiceHandler extends GenericServiceHandler {
     const clientObj = this.api
     const PaysafeReqObj = new PaysafeMethod(prepareURI(STANDALONE_PATH + SEPARATOR + standaloneCredit.id, clientObj),
       constants.GET)
-    const response = this.request(PaysafeReqObj, standaloneCredit)
+    const response = await this.request(PaysafeReqObj, standaloneCredit)
     return new StandaloneCredit(response)
   }
 
@@ -63,7 +63,7 @@ export class DirectDebitServiceHandler extends GenericServiceHandler {
   async submitStandalone(standaloneCredit: StandaloneCredit): Promise<StandaloneCredit> {
     const clientObj = this.api
     const PaysafeReqObj = new PaysafeMethod(prepareURI(STANDALONE_PATH, clientObj), constants.POST)
-    const response = this.request(PaysafeReqObj, standaloneCredit)
+    const response = await this.request(PaysafeReqObj, standaloneCredit)
     return new StandaloneCredit(response)
   }
 
@@ -71,7 +71,7 @@ export class DirectDebitServiceHandler extends GenericServiceHandler {
     const clientObj = this.api
     const PaysafeReqObj = new PaysafeMethod(prepareURI(PURCHASE_PATH + SEPARATOR + purchase.id, clientObj),
       constants.PUT)
-    const response = this.request(PaysafeReqObj, purchase)
+    const response = await this.request(PaysafeReqObj, purchase)
     return new Purchase(response)
   }
 
@@ -82,7 +82,7 @@ export class DirectDebitServiceHandler extends GenericServiceHandler {
     const clientObj = this.api
     const PaysafeReqObj = new PaysafeMethod(prepareURI(STANDALONE_PATH + SEPARATOR + standaloneCredit.id, clientObj),
       constants.PUT)
-    const response = this.request(PaysafeReqObj, standaloneCredit)
+    const response = await this.request(PaysafeReqObj, standaloneCredit)
     return new StandaloneCredit(response)
   }
 
@@ -122,7 +122,7 @@ export class DirectDebitServiceHandler extends GenericServiceHandler {
         const toInclude = this.searchMerchantRefCommon(classObj, pagination)
         const requestObj = new PaysafeMethod(prepareURI(upperClassName + '?'
           + toInclude, clientObj), constants.GET)
-        const response = this.request(requestObj, null)
+        const response = await this.request(requestObj, null)
         return new constructor(response)
       } else {
         throw this.exception('Please provide valid class name for search')
