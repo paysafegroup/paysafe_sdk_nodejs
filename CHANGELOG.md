@@ -1,3 +1,16 @@
+# [1.3.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.2.0...v1.3.0) (2021-02-10)
+
+
+### Bug Fixes
+
+* awaiting direct debit requests ([2f5628e](https://github.com/gettilled/paysafe_sdk_nodejs/commit/2f5628eae8be6a779a788150a4d58c25f231588b))
+* splitpay for direct debit ([32927b2](https://github.com/gettilled/paysafe_sdk_nodejs/commit/32927b2bb86392a5474a937c9835c2ed0f5777e2))
+
+
+### Features
+
+* ach single use token creation ([5e74efb](https://github.com/gettilled/paysafe_sdk_nodejs/commit/5e74efb28527ddf4d3f1326490ff14c2d5ed46a1))
+
 # [1.2.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.1.3...v1.2.0) (2021-02-05)
 
 
