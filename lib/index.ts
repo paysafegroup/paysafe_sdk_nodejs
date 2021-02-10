@@ -39,7 +39,7 @@ import { EFTBankAccount } from './customervault/EFTBankAccount'
 import { Mandate } from './customervault/mandate'
 import { Profile } from './customervault/profile'
 import { SEPABankAccount } from './customervault/SEPABankAccount'
-import { Purchase } from './directdebit/purchase'
+import { Purchase, PurchaseStatus } from './directdebit/purchase'
 import { StandaloneCredit } from './directdebit/standalonecredits'
 import { DirectDebitServiceHandler } from './DirectDebitServiceHandler'
 import { MerchantServiceHandler } from './MerchantServiceHandler'
@@ -87,6 +87,7 @@ export {
   SEPABankAccount,
   Mandate,
   Purchase,
+  PurchaseStatus,
   StandaloneCredit,
   EnrollmentCheck,
   SplitPayout, ISplitPayout,

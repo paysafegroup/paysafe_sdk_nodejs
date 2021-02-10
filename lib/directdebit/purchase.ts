@@ -1,10 +1,13 @@
 import { BillingDetails } from '../cardpayments/billingDetails'
+import { ISplitPayout, SplitPayout } from '../cardpayments/splitPayout'
 import { ACHBankAccount } from '../customervault/ACHBankAccount'
 import { BACSBankAccount } from '../customervault/BACSBankAccount'
 import { EFTBankAccount } from '../customervault/EFTBankAccount'
 import { Profile } from '../customervault/profile'
 import { SEPABankAccount } from '../customervault/SEPABankAccount'
 import { GenericLinkedObject } from '../generic-linked-object'
+
+export type PurchaseStatus = 'RECEIVED' | 'PENDING' | 'COMPLETED' | 'PROCESSING' | 'FAILED' | 'CANCELLED'
 
 export class Purchase extends GenericLinkedObject {
   merchantRefNum: string
@@ -19,8 +22,9 @@ export class Purchase extends GenericLinkedObject {
   dupCheck: boolean
   txnTime: string
   currencyCode: string
-  status: string
+  status: PurchaseStatus
   purchases: Purchase[]
+  splitpay?: SplitPayout[] | ISplitPayout[]
 
   constructor(resp) {
     super(resp)
@@ -67,6 +71,9 @@ export class Purchase extends GenericLinkedObject {
       }
       if (resp.purchases) {
         this.purchases = resp.purchases.map((purchase) => new Purchase(purchase))
+      }
+      if (resp.splitpay) {
+        this.splitpay = resp.splitpay.map((splitpayout) => new SplitPayout(splitpayout))
       }
     }
   }
@@ -175,7 +182,15 @@ export class Purchase extends GenericLinkedObject {
     return this.purchases
   }
 
-  setStatus(status) {
+  setSplitpay(splitpay: SplitPayout[]) {
+    this.splitpay = splitpay
+  }
+
+  getSplitpay() {
+    return this.splitpay
+  }
+
+  setStatus(status: PurchaseStatus) {
     this.status = status
   }
 
