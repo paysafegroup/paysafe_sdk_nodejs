@@ -44,6 +44,37 @@ export class CustomerServiceHandler extends GenericServiceHandler {
     return new Profile(response)
   }
 
+  /**
+   *
+   * @param profileId If supplied, the profile is looked up via ID.
+   * @param merchantCustomerId If the profileId is not supplied, the merchantCustomerId is used for the lookup.
+   * @param includeSubcomponents If `true`, the following sub-components will be attached to the response:
+   * cards, addresses, achbankaccounts, eftbankaccounts
+   */
+  async getProfile(profileId?: string, merchantCustomerId?: string, includeSubcomponents = false): Promise<Profile> {
+    let path: string
+    if (profileId) {
+      path = PROFILE_PATH + profileId + (includeSubcomponents ? '?' : '')
+    } else if (merchantCustomerId) {
+      path = PROFILE_PATH + '?merchantCustomerId=' + merchantCustomerId + (includeSubcomponents ? '&' : '')
+    } else {
+      throw this.exception('profileId and merchantCustomerId are missing in CustomerServiceHandler.getProfile')
+    }
+
+    if (includeSubcomponents) {
+      path += 'fields=cards,addresses,achbankaccounts,eftbankaccounts'
+    }
+
+    const method = new PaysafeMethod(prepareURI(path), constants.GET)
+    const response = await this.request(method, null)
+    const profile = new Profile(response)
+
+    return Promise.resolve(profile)
+  }
+
+  /**
+   * @deprecated Use 'getProfile' instead.
+   */
   async getCustomerProfile(profile: Profile): Promise<Profile> {
     let path: string
     if (profile && profile.id) {
@@ -199,7 +230,7 @@ export class CustomerServiceHandler extends GenericServiceHandler {
    * @param singleUseToken The single-use token returned in response to a single-use token creation request.
    * @param accountId The merchant account ID that the merhant provides and will be linked to the card. (e.g. 1002370290)
    */
-  async createCustomerCardFromSingleUseToken(profileId: string, singleUseToken: string, accountId?: string): Promise<Card> {
+  async createProfileCardFromSingleUseToken(profileId: string, singleUseToken: string, accountId?: string): Promise<Card> {
     const method = new PaysafeMethod(prepareURI(PROFILE_PATH + profileId + CARD_PATH), constants.POST)
     const requestObj = {
       singleUseToken,
@@ -226,6 +257,10 @@ export class CustomerServiceHandler extends GenericServiceHandler {
     }
   }
 
+  /**
+   *
+   * @deprecated Use deleteProfileCard instead
+   */
   async deleteCustomerCard(card: Card): Promise<Card> {
     if (card && card.profile && card.profile.id) {
       const profile = card.profile
@@ -238,6 +273,17 @@ export class CustomerServiceHandler extends GenericServiceHandler {
       } else {
         throw this.exception('card id is missing in CustomerServiceHandler.deleteCustomerCard')
       }
+    } else {
+      throw this.exception('profile id is missing in CustomerServiceHandler.deleteCustomerCard')
+    }
+  }
+
+  async deleteProfileCard(profileId: string, cardId: string): Promise<void> {
+    if (profileId && cardId) {
+        const method = new PaysafeMethod(prepareURI(PROFILE_PATH + profileId + CARD_PATH + cardId),
+          constants.DELETE)
+        const response = await this.request(method, null)
+        return Promise.resolve()
     } else {
       throw this.exception('profile id is missing in CustomerServiceHandler.deleteCustomerCard')
     }
@@ -278,6 +324,20 @@ export class CustomerServiceHandler extends GenericServiceHandler {
   }
 
   /**
+   * Method for Create ACH Bank Account with Single-Use Token.
+   */
+  async createProfileACHBankAccountWithSingleUseToken(profileId: string, singleUseToken: string): Promise<ACHBankAccount> {
+    if (profileId && singleUseToken) {
+      const method = new PaysafeMethod(prepareURI(PROFILE_PATH + profileId + ACH_BANK_ACC_PATH),
+        constants.POST)
+      const response = await this.request(method, { singleUseToken })
+      return new ACHBankAccount(response)
+    } else {
+      throw this.exception('profileId or singleUseToken missing in CustomerServiceHandler.createACHBankAccountWithSingleUseToken')
+    }
+  }
+
+  /**
    * Method to Look Up an ACH Bank Account.
    */
   async getACHBankAccount(bankAccount: ACHBankAccount): Promise<ACHBankAccount> {
@@ -307,6 +367,7 @@ export class CustomerServiceHandler extends GenericServiceHandler {
 
   /**
    * Method to Delete an ACH Bank Account.
+   * @deprecated Use deleteProfileACHBankAccount instead
    */
   async deleteACHBankAccount(bankAccount: ACHBankAccount): Promise<ACHBankAccount> {
     if (bankAccount && bankAccount.id && bankAccount.profile && bankAccount.profile.id) {
@@ -316,6 +377,20 @@ export class CustomerServiceHandler extends GenericServiceHandler {
       return new ACHBankAccount(response)
     } else {
       throw this.exception('profile id is missing in CustomerServiceHandler.deleteACHBankAccount')
+    }
+  }
+
+  /**
+   * Method to Delete a Profile's ACH Bank Account.
+   */
+  async deleteProfileACHBankAccount(profileId: string, bankAccountId: string): Promise<void> {
+    if (profileId && bankAccountId) {
+      const method = new PaysafeMethod(prepareURI(PROFILE_PATH + profileId
+        + ACH_BANK_ACC_PATH + '/' + bankAccountId), constants.DELETE)
+      const response = await this.request(method, null)
+      return Promise.resolve()
+    } else {
+      throw this.exception('profileId or bankAccountId is missing in CustomerServiceHandler.deleteProfileACHBankAccount')
     }
   }
 
