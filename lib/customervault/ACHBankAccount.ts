@@ -89,11 +89,11 @@ export class ACHBankAccount extends GenericObject {
     return this.status
   }
 
-  setstatusReason(statusReason) {
+  setStatusReason(statusReason) {
     this.statusReason = statusReason
   }
 
-  getstatusReason() {
+  getStatusReason() {
     return this.statusReason
   }
 

@@ -100,11 +100,11 @@ export class StandaloneCredit extends GenericLinkedObject {
     return this.ach
   }
 
-  setETF(eft: EFTBankAccount) {
+  setEFT(eft: EFTBankAccount) {
     this.eft = eft
   }
 
-  getETF() {
+  getEFT() {
     return this.eft
   }
 

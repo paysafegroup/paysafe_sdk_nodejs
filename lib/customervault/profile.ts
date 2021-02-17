@@ -24,10 +24,10 @@ export interface IProfile extends IGenericObject {
   paymentToken?: string
   addresses?: Address[]
   cards?: Card[]
-  achbankaccounts?: ACHBankAccount[]
-  eftbankaccounts?: EFTBankAccount[]
-  bacsbankaccounts?: BACSBankAccount[]
-  sepabankaccounts?: SEPABankAccount[]
+  achBankAccounts?: ACHBankAccount[]
+  eftBankAccounts?: EFTBankAccount[]
+  bacsBankAccounts?: BACSBankAccount[]
+  sepaBankAccounts?: SEPABankAccount[]
 }
 
 export class Profile extends GenericObject {
@@ -47,10 +47,10 @@ export class Profile extends GenericObject {
   paymentToken: string
   addresses: Address[]
   cards: Card[]
-  achbankaccounts: ACHBankAccount[]
-  eftbankaccounts: EFTBankAccount[]
-  bacsbankaccounts: BACSBankAccount[]
-  sepabankaccounts: SEPABankAccount[]
+  achBankAccounts: ACHBankAccount[]
+  eftBankAccounts: EFTBankAccount[]
+  bacsBankAccounts: BACSBankAccount[]
+  sepaBankAccounts: SEPABankAccount[]
 
   constructor(resp?: IProfile) {
     super(resp)
@@ -111,32 +111,32 @@ export class Profile extends GenericObject {
           this.cards = resp.cards
         }
       }
-      if (resp.achbankaccounts) {
-        if (resp.achbankaccounts instanceof Array) {
-          this.achbankaccounts = resp.achbankaccounts.map((a) => new ACHBankAccount(a))
+      if (resp.achBankAccounts) {
+        if (resp.achBankAccounts instanceof Array) {
+          this.achBankAccounts = resp.achBankAccounts.map((a) => new ACHBankAccount(a))
         } else {
-          this.achbankaccounts = resp.achbankaccounts
+          this.achBankAccounts = resp.achBankAccounts
         }
       }
-      if (resp.eftbankaccounts) {
-        if (resp.eftbankaccounts instanceof Array) {
-          this.eftbankaccounts = resp.eftbankaccounts.map((a) => new EFTBankAccount(a))
+      if (resp.eftBankAccounts) {
+        if (resp.eftBankAccounts instanceof Array) {
+          this.eftBankAccounts = resp.eftBankAccounts.map((a) => new EFTBankAccount(a))
         } else {
-          this.eftbankaccounts = resp.eftbankaccounts
+          this.eftBankAccounts = resp.eftBankAccounts
         }
       }
-      if (resp.bacsbankaccounts) {
-        if (resp.bacsbankaccounts instanceof Array) {
-          this.bacsbankaccounts = resp.bacsbankaccounts.map((a) => new BACSBankAccount(a))
+      if (resp.bacsBankAccounts) {
+        if (resp.bacsBankAccounts instanceof Array) {
+          this.bacsBankAccounts = resp.bacsBankAccounts.map((a) => new BACSBankAccount(a))
         } else {
-          this.bacsbankaccounts = resp.bacsbankaccounts
+          this.bacsBankAccounts = resp.bacsBankAccounts
         }
       }
-      if (resp.sepabankaccounts) {
-        if (resp.sepabankaccounts instanceof Array) {
-          this.sepabankaccounts = resp.sepabankaccounts.map((a) => new SEPABankAccount(a))
+      if (resp.sepaBankAccounts) {
+        if (resp.sepaBankAccounts instanceof Array) {
+          this.sepaBankAccounts = resp.sepaBankAccounts.map((a) => new SEPABankAccount(a))
         } else {
-          this.sepabankaccounts = resp.sepabankaccounts
+          this.sepaBankAccounts = resp.sepaBankAccounts
         }
       }
       if (resp.status) {
@@ -170,35 +170,35 @@ export class Profile extends GenericObject {
   }
 
   setACHBankAccounts(achbankaccounts) {
-    this.achbankaccounts = achbankaccounts
+    this.achBankAccounts = achbankaccounts
   }
 
   getACHBankAccounts() {
-    return this.achbankaccounts
+    return this.achBankAccounts
   }
 
   setEFTBankAccounts(eftbankaccounts) {
-    this.eftbankaccounts = eftbankaccounts
+    this.eftBankAccounts = eftbankaccounts
   }
 
   getEFTBankAccounts() {
-    return this.eftbankaccounts
+    return this.eftBankAccounts
   }
 
   setBACSBankAccounts(bacsbankaccounts) {
-    this.bacsbankaccounts = bacsbankaccounts
+    this.bacsBankAccounts = bacsbankaccounts
   }
 
   getBACSBankAccounts() {
-    return this.bacsbankaccounts
+    return this.bacsBankAccounts
   }
 
   setSEPABankAccounts(sepabankaccounts) {
-    this.sepabankaccounts = sepabankaccounts
+    this.sepaBankAccounts = sepabankaccounts
   }
 
   getSEPABankAccounts() {
-    return this.sepabankaccounts
+    return this.sepaBankAccounts
   }
 
   setAddresses(addresses) {
