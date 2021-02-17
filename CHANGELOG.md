@@ -1,3 +1,15 @@
+# [1.5.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.4.0...v1.5.0) (2021-02-17)
+
+
+### Bug Fixes
+
+* typos in profile bank accounts ([f3bf998](https://github.com/gettilled/paysafe_sdk_nodejs/commit/f3bf99866578dc08d673f098ee1c95fa386d30ce))
+
+
+### Features
+
+* create/delete profile.achBankAccount ([edecacc](https://github.com/gettilled/paysafe_sdk_nodejs/commit/edecacc8d9be91dac6b71166ff18cf86358040f6))
+
 # [1.4.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.3.0...v1.4.0) (2021-02-17)
 
 
