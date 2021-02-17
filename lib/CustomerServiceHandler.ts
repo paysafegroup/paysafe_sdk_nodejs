@@ -4,6 +4,7 @@ import { ACHBankAccount } from './customervault/ACHBankAccount'
 import { ACHSingleUseToken } from './customervault/ACHSingleUseToken'
 import { Address } from './customervault/address'
 import { BACSBankAccount } from './customervault/BACSBankAccount'
+import { CardSingleUseToken } from './customervault/CardSingleUseToken'
 import { EFTBankAccount } from './customervault/EFTBankAccount'
 import { Mandate } from './customervault/mandate'
 import { Profile } from './customervault/profile'
@@ -24,6 +25,7 @@ const EFT_BANK_ACC_PATH = '/eftbankaccounts'
 const MANDATES = '/mandates/'
 const SEPARATOR = '/'
 const ACH_SINGLE_USE_TOKENS_PATH = '/achsingleusetokens'
+const CARD_SINGLE_USE_TOKENS_PATH = '/singleusetokens'
 
 function prepareURI(path: string) {
   return URI + path
@@ -189,6 +191,22 @@ export class CustomerServiceHandler extends GenericServiceHandler {
     } else {
       throw this.exception('profile id is missing in CustomerServiceHandler.createCustomerCard')
     }
+  }
+
+  /**
+   *
+   * @param profileId The ID of the profile to which the card is being added. (e.g. a5f1889d-f1be-4bbf-941d-fd9b8d09d5b1)
+   * @param singleUseToken The single-use token returned in response to a single-use token creation request.
+   * @param accountId The merchant account ID that the merhant provides and will be linked to the card. (e.g. 1002370290)
+   */
+  async createCustomerCardFromSingleUseToken(profileId: string, singleUseToken: string, accountId?: string): Promise<Card> {
+    const method = new PaysafeMethod(prepareURI(PROFILE_PATH + profileId + CARD_PATH), constants.POST)
+    const requestObj = {
+      singleUseToken,
+      accountId,
+    }
+    const response = await this.request(method, requestObj)
+    return new Card(response)
   }
 
   async getCustomerCard(card: Card): Promise<Card> {
@@ -597,4 +615,9 @@ export class CustomerServiceHandler extends GenericServiceHandler {
     return new ACHSingleUseToken(response)
   }
 
+  async getCardWithSingleUseToken(paymentToken: string): Promise<CardSingleUseToken> {
+    const requestObj = new PaysafeMethod(prepareURI(CARD_SINGLE_USE_TOKENS_PATH + SEPARATOR + 'search'), constants.POST)
+    const response = await this.request(requestObj, { paymentToken })
+    return new CardSingleUseToken(response)
+  }
 }

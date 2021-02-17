@@ -34,6 +34,7 @@ import { ACHBankAccount } from './customervault/ACHBankAccount'
 import { ACHSingleUseToken, IACHSingleUseToken } from './customervault/ACHSingleUseToken'
 import { Address, IAddress } from './customervault/address'
 import { BACSBankAccount } from './customervault/BACSBankAccount'
+import { CardSingleUseToken, ICardSingleUseToken } from './customervault/CardSingleUseToken'
 import { DateOfBirth, IDateOfBirth } from './customervault/dateofbirth'
 import { EFTBankAccount } from './customervault/EFTBankAccount'
 import { Mandate } from './customervault/mandate'
@@ -92,6 +93,7 @@ export {
   EnrollmentCheck,
   SplitPayout, ISplitPayout,
   ACHSingleUseToken, IACHSingleUseToken,
+  CardSingleUseToken, ICardSingleUseToken,
 }
 
 export { PaysafeError as Error }
@@ -137,6 +139,7 @@ export class Paysafe {
   EnrollmentCheck = EnrollmentCheck
   SplitPayout = SplitPayout
   ACHSingleUseToken = ACHSingleUseToken
+  CardSingleUseToken = CardSingleUseToken
   // authentication = require('./threedsecure/authentications')
 
   public merchantService: MerchantServiceHandler

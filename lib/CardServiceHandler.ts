@@ -8,7 +8,7 @@ import * as constants from './constants'
 import { GenericServiceHandler } from './generic-service-handler'
 import { PaysafeMethod } from './PaysafeMethod'
 
-type MerchantRefType = Authorization | AuthorizationReversal | Settlement | Refund
+type MerchantRefType = Authorization | AuthorizationReversal | Settlement | Refund | Verification
 
 // PATH
 const HEALTH_BEAT_URL = 'cardpayments/monitor'
@@ -229,7 +229,7 @@ export class CardServiceHandler extends GenericServiceHandler {
    */
   async searchByMerchantRef(classObj: MerchantRefType, pagination: Pagination): Promise<MerchantRefType> {
     const constructor = classObj.constructor as typeof Authorization | typeof AuthorizationReversal |
-      typeof Settlement | typeof Refund
+      typeof Settlement | typeof Refund | typeof Verification
     if (classObj && classObj.merchantRefNum) {
       const upperClassName = SEARCHMERACHANTREFERENCE[constructor.name.toUpperCase()]
       if (upperClassName) {
