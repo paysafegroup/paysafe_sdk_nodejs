@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.3.0...v1.4.0) (2021-02-17)
+
+
+### Features
+
+* get card with single-use token ([6cd5bca](https://github.com/gettilled/paysafe_sdk_nodejs/commit/6cd5bca918bbb37fc5b0cfd0de41fd96ad753eef))
+
 # [1.3.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.2.0...v1.3.0) (2021-02-10)
 
 
