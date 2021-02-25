@@ -33,8 +33,12 @@ export class GenericServiceHandler {
   }
 
   protected debug(message: string) {
-    if (this.api.debugging) {
-      (console as any).log(message)
+    if (this.api.logging) {
+      if (this.api.logging === true) {
+        // tslint:disable-next-line: no-console
+        this.api.logging = console.log
+      }
+      this.api.logging(message)
     }
   }
 

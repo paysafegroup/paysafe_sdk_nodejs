@@ -5,5 +5,8 @@ export interface PaysafeAPIDetails {
   password: string
   environment: Environment
   accountNumber: string
-  debugging?: boolean
+  /**
+   * If `true` then `console.log` is used by default.
+   */
+  logging?: boolean | ((message: any) => void)
 }

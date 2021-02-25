@@ -158,7 +158,7 @@ export class Paysafe {
         password: apiPassword,
         environment: env,
         accountNumber,
-        debugging: environment !== 'LIVE',
+        logging: environment !== 'LIVE',
       }
 
       // Services
@@ -180,9 +180,16 @@ export class Paysafe {
     }
   }
 
+  /**
+   * @deprecated Use `setLogging` instead.
+   */
   enabledDebugging() {
-    this.api.debugging = true
+    this.api.logging = true
     return this
+  }
+
+  setLogging(logging?: boolean | ((message: any) => void)) {
+    this.api.logging = logging
   }
 
   error(code: string, message: string) {
