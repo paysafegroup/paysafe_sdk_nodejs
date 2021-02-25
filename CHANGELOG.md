@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.5.0...v1.6.0) (2021-02-25)
+
+
+### Features
+
+* adding custom logging function ([c3a20b2](https://github.com/gettilled/paysafe_sdk_nodejs/commit/c3a20b2c7f0e126b98a86092f3ca7385f6633d6b))
+
 # [1.5.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.4.0...v1.5.0) (2021-02-17)
 
 
