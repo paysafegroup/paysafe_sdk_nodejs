@@ -1,6 +1,7 @@
 import { GenericLinkedObject } from '../generic-linked-object'
 import { AcquirerResponse } from './acquirerResponse'
 import { Settlement } from './settlement'
+import { ISplitPayout, SplitPayout } from './splitPayout'
 
 export type RefundStatus = 'RECEIVED' | 'COMPLETED' | 'PENDING' | 'FAILED' | 'CANCELLED'
 
@@ -30,6 +31,7 @@ export class Refund extends GenericLinkedObject {
   mode: string
   authType: string
   confirmationNumber: string
+  splitpay?: SplitPayout[] | ISplitPayout[]
 
   constructor(resp?: any) {
     super(resp)
@@ -76,6 +78,9 @@ export class Refund extends GenericLinkedObject {
       }
       if (resp.authType) {
         this.authType = resp.authType
+      }
+      if (resp.splitpay) {
+        this.splitpay = resp.splitpay.map((splitpayout) => new SplitPayout(splitpayout))
       }
       if (resp.confirmationNumber) {
         this.confirmationNumber = resp.confirmationNumber
@@ -199,5 +204,13 @@ export class Refund extends GenericLinkedObject {
   }
   getMerchantRefNum() {
     return this.merchantRefNum
+  }
+
+  setSplitpay(splitpay: SplitPayout[]) {
+    this.splitpay = splitpay
+  }
+
+  getSplitpay() {
+    return this.splitpay
   }
 }
