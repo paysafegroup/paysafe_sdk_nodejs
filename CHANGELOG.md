@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.6.0...v1.6.1) (2021-03-09)
+
+
+### Bug Fixes
+
+* splitpay for refunds ([30e05e0](https://github.com/gettilled/paysafe_sdk_nodejs/commit/30e05e0070c9fa4379bcccaff8a49fb99d0a4808))
+
 # [1.6.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.5.0...v1.6.0) (2021-02-25)
 
 
