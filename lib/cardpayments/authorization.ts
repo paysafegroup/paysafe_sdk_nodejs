@@ -10,6 +10,7 @@ import { MasterPass } from './masterPass'
 import { Settlement } from './settlement'
 import { ShippingDetails } from './shippingDetails'
 import { ISplitPayout, SplitPayout } from './splitPayout'
+import { IStoredCredential, StoredCredential } from './storedCredential'
 import { VisaAdditionalAuthData } from './visaAdditionalAuthData'
 
 export type Recurring = 'INITIAL' | 'RECURRING'
@@ -30,6 +31,7 @@ export interface IAuthorization extends IGenericLinkedObject {
   billingDetails?: BillingDetails | IBillingDetails
   shippingDetails?: ShippingDetails
   recurring?: Recurring
+  storedCredential?: IStoredCredential
   customerIp?: string
   dupCheck?: boolean
   keywords?: string[]
@@ -63,6 +65,10 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
   billingDetails: BillingDetails
   shippingDetails: ShippingDetails
   recurring?: Recurring
+  /**
+   * Note: storedCredential object cannot be used for Apple Pay or Google Pay transactions.
+   */
+  storedCredential: StoredCredential
   customerIp: string
   dupCheck: boolean
   keywords: string[]
@@ -119,9 +125,11 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
       if (resp.shippingDetails) {
         this.shippingDetails = new ShippingDetails(resp.shippingDetails)
       }
-      // TODO: storedCredential
       if (resp.recurring) {
         this.recurring = resp.recurring
+      }
+      if (resp.storedCredential) {
+        this.storedCredential = new StoredCredential(resp.storedCredential)
       }
       if (resp.customerIp) {
         this.customerIp = resp.customerIp
@@ -330,6 +338,14 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
 
   getRecurring() {
     return this.recurring
+  }
+
+  setStoredCredential(storedCredential: StoredCredential) {
+    this.storedCredential = storedCredential
+  }
+
+  getStoredCredential() {
+    return this.storedCredential
   }
 
   setBillingDetails(billingDetails: BillingDetails | IBillingDetails) {

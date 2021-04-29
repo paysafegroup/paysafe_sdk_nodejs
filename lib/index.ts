@@ -25,6 +25,7 @@ import { Refund, RefundStatus } from './cardpayments/refund'
 import { Settlement } from './cardpayments/settlement'
 import { ShippingDetails } from './cardpayments/shippingDetails'
 import { ISplitPayout, SplitPayout } from './cardpayments/splitPayout'
+import { IStoredCredential, StoredCredential } from './cardpayments/storedCredential'
 import { Verification } from './cardpayments/verification'
 import { VisaAdditionalAuthData } from './cardpayments/visaAdditionalAuthData'
 import { CardServiceHandler } from './CardServiceHandler'
@@ -77,6 +78,7 @@ export {
   Refund, RefundStatus,
   Settlement,
   ShippingDetails,
+  StoredCredential, IStoredCredential,
   Verification,
   VisaAdditionalAuthData,
   Address, IAddress,
@@ -124,6 +126,7 @@ export class Paysafe {
   Refund = Refund
   Settlement = Settlement
   ShippingDetails = ShippingDetails
+  StoredCredential = StoredCredential
   Verification = Verification
   VisaAdditionalAuthData = VisaAdditionalAuthData
   Address = Address
