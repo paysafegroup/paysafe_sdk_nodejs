@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.6.1...v1.7.0) (2021-04-29)
+
+
+### Features
+
+* add authorization.storedCredential ([5eac841](https://github.com/gettilled/paysafe_sdk_nodejs/commit/5eac841f6d2f2d6a21abd18f0089f2b7d64735ec))
+
 ## [1.6.1](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.6.0...v1.6.1) (2021-03-09)
 
 
