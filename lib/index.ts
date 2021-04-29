@@ -33,6 +33,8 @@ import { CustomerServiceHandler } from './CustomerServiceHandler'
 import { ACHBankAccount } from './customervault/ACHBankAccount'
 import { ACHSingleUseToken, IACHSingleUseToken } from './customervault/ACHSingleUseToken'
 import { Address, IAddress } from './customervault/address'
+import { ApplePayPaymentToken, IApplePayPaymentToken } from './customervault/ApplePayPaymentToken'
+import { ApplePaySingleUseToken, IApplePaySingleUseToken } from './customervault/ApplePaySingleUseToken'
 import { BACSBankAccount } from './customervault/BACSBankAccount'
 import { CardSingleUseToken, ICardSingleUseToken } from './customervault/CardSingleUseToken'
 import { DateOfBirth, IDateOfBirth } from './customervault/dateofbirth'
@@ -94,6 +96,8 @@ export {
   SplitPayout, ISplitPayout,
   ACHSingleUseToken, IACHSingleUseToken,
   CardSingleUseToken, ICardSingleUseToken,
+  ApplePaySingleUseToken, IApplePaySingleUseToken,
+  ApplePayPaymentToken, IApplePayPaymentToken,
 }
 
 export { PaysafeError as Error }
@@ -140,6 +144,8 @@ export class Paysafe {
   SplitPayout = SplitPayout
   ACHSingleUseToken = ACHSingleUseToken
   CardSingleUseToken = CardSingleUseToken
+  ApplePaySingleUseToken = ApplePaySingleUseToken
+  ApplePayPaymentToken = ApplePayPaymentToken
   // authentication = require('./threedsecure/authentications')
 
   public merchantService: MerchantServiceHandler
