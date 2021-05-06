@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.7.0...v1.8.0) (2021-05-06)
+
+
+### Features
+
+* apple pay single use token support ([f3af799](https://github.com/gettilled/paysafe_sdk_nodejs/commit/f3af799e5f27d9adaff1a501d4bcdd9c12613f32))
+
 # [1.7.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.6.1...v1.7.0) (2021-04-29)
 
 
