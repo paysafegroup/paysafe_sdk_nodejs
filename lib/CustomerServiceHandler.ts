@@ -3,6 +3,8 @@ import * as constants from './constants'
 import { ACHBankAccount } from './customervault/ACHBankAccount'
 import { ACHSingleUseToken } from './customervault/ACHSingleUseToken'
 import { Address } from './customervault/address'
+import { IApplePayPaymentToken } from './customervault/ApplePayPaymentToken'
+import { ApplePaySingleUseToken } from './customervault/ApplePaySingleUseToken'
 import { BACSBankAccount } from './customervault/BACSBankAccount'
 import { CardSingleUseToken } from './customervault/CardSingleUseToken'
 import { EFTBankAccount } from './customervault/EFTBankAccount'
@@ -26,6 +28,7 @@ const MANDATES = '/mandates/'
 const SEPARATOR = '/'
 const ACH_SINGLE_USE_TOKENS_PATH = '/achsingleusetokens'
 const CARD_SINGLE_USE_TOKENS_PATH = '/singleusetokens'
+const APPLE_PAY_SINGLE_USE_TOKENS_PATH = '/applepaysingleusetokens'
 
 function prepareURI(path: string) {
   return URI + path
@@ -694,5 +697,12 @@ export class CustomerServiceHandler extends GenericServiceHandler {
     const requestObj = new PaysafeMethod(prepareURI(CARD_SINGLE_USE_TOKENS_PATH + SEPARATOR + 'search'), constants.POST)
     const response = await this.request(requestObj, { paymentToken })
     return new CardSingleUseToken(response)
+  }
+
+  async createApplePaySingleUseToken(applePayPaymentToken: IApplePayPaymentToken): Promise<ApplePaySingleUseToken> {
+    const token = new ApplePaySingleUseToken({ applePayPaymentToken })
+    const requestObj = new PaysafeMethod(prepareURI(APPLE_PAY_SINGLE_USE_TOKENS_PATH), constants.POST)
+    const response = await this.request(requestObj, token)
+    return new ApplePaySingleUseToken(response)
   }
 }
