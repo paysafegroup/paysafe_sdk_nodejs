@@ -1,11 +1,13 @@
 import { Card, ICard } from '../cardpayments/card'
 import { GenericObject, IGenericObject } from '../generic'
+import { Address, IAddress } from './address'
 
 export interface ICardSingleUseToken extends IGenericObject {
   paymentToken: string
   timeToLiveSeconds?: number // This is the period of time the single-use token is valid before expiration, in seconds.
   isFromMultiUseToken?: boolean
   card: ICard
+  billingAddress?: IAddress
 }
 
 export class CardSingleUseToken extends GenericObject implements ICardSingleUseToken {
@@ -13,6 +15,7 @@ export class CardSingleUseToken extends GenericObject implements ICardSingleUseT
   timeToLiveSeconds?: number
   isFromMultiUseToken?: boolean
   card: Card
+  billingAddress?: Address
 
   constructor(data?: ICardSingleUseToken) {
     super(data)
@@ -29,6 +32,9 @@ export class CardSingleUseToken extends GenericObject implements ICardSingleUseT
       }
       if (data.card) {
         this.card = new Card(data.card)
+      }
+      if (data.billingAddress) {
+        this.billingAddress = new Address(data.billingAddress)
       }
     }
   }
@@ -63,5 +69,12 @@ export class CardSingleUseToken extends GenericObject implements ICardSingleUseT
 
   getCard() {
     return this.card
+  }
+
+  setBillingAddress(billingAddress: Address) {
+    this.billingAddress = billingAddress
+  }
+  getBillingAddress() {
+    return this.billingAddress
   }
 }
