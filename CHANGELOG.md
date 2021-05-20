@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.8.0...v1.9.0) (2021-05-20)
+
+
+### Features
+
+* add billingAddress to CardSingleUseToken ([da88cee](https://github.com/gettilled/paysafe_sdk_nodejs/commit/da88cee80a9cd69532f225e35cb13122136d0e6a))
+
 # [1.8.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.7.0...v1.8.0) (2021-05-06)
 
 
