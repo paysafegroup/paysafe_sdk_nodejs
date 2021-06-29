@@ -71,7 +71,13 @@ export class GenericServiceHandler {
         throw PaysafeError.generate(error.code || 500, 'Failed to parse body')
       }
 
-      if (response && response.error) {
+      // We should probably check X-Application-Status-Code header as well/instead
+      // Some requests are populating an 'error: { code: '0', message: 'no_error' }' response
+      // along side the rest of the response. We can:
+      // (a) look for a non-zero code
+      // (b) look for an 'id' property?
+      // (c) look for any other property along side 'error'?
+      if (response && response.error && response.error.code !== '0') {
         throw new PaysafeError(response.error)
       } else {
         return response
