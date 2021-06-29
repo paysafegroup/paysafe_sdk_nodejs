@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.9.0...v1.9.1) (2021-06-29)
+
+
+### Bug Fixes
+
+* handle 'no_error' ([383d063](https://github.com/gettilled/paysafe_sdk_nodejs/commit/383d063bd647a969ea96efc004649c9156c6e795))
+
 # [1.9.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.8.0...v1.9.0) (2021-05-20)
 
 
