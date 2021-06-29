@@ -62,7 +62,7 @@ export class Level2Level3 implements ILevel2Level3 {
    */
   lineItems: LineItem[] | ILineItem[]
 
-  constructor(resp) {
+  constructor(resp?: ILevel2Level3) {
     if (resp) {
       if (resp.exemptLocalTax) {
         this.exemptLocalTax = resp.exemptLocalTax
