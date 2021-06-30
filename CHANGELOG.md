@@ -1,3 +1,17 @@
+# [1.10.0](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.9.1...v1.10.0) (2021-06-30)
+
+
+### Bug Fixes
+
+* send values even when 0 ([71cb0ce](https://github.com/gettilled/paysafe_sdk_nodejs/commit/71cb0cee26eb78ede981bae73b9f7a421ecb5440))
+
+
+### Features
+
+* add support for level2leve3 paysafe properties on card auths ([e3086b3](https://github.com/gettilled/paysafe_sdk_nodejs/commit/e3086b3cf1f80bdeb53339524e2d467915ee7270))
+* add type to parameter ([47ff733](https://github.com/gettilled/paysafe_sdk_nodejs/commit/47ff7334a683f20ecbf185daf01c8fd0cd4ade9b))
+* cleanup ([e67b8e2](https://github.com/gettilled/paysafe_sdk_nodejs/commit/e67b8e23e206ded9928878b66ca2404bdf5bd021))
+
 ## [1.9.1](https://github.com/gettilled/paysafe_sdk_nodejs/compare/v1.9.0...v1.9.1) (2021-06-29)
 
 
