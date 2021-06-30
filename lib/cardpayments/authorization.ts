@@ -248,6 +248,14 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
     return this.acquirerResponse
   }
 
+  setLevel2Level3(level2Level3: (Level2Level3 | ILevel2Level3)) {
+    this.level2Level3 = new Level2Level3(level2Level3)
+  }
+
+  getLevel2Level3() {
+    return this.level2Level3
+  }
+
   setRiskReasonCode(riskReasonCode: number[]) {
     this.riskReasonCode = riskReasonCode
   }

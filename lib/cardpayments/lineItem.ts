@@ -8,7 +8,7 @@ export interface ILineItem {
   totalAmount: number
 }
 
-export class LineItem {
+export class LineItem implements ILineItem {
   /**
    * This is a description of the item(s) being purchased.
    */
@@ -116,6 +116,4 @@ export class LineItem {
   getTaxRate() {
     return this.taxRate
   }
-
-
 }

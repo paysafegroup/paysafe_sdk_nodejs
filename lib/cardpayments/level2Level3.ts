@@ -9,7 +9,7 @@ export interface ILevel2Level3 {
    destinationZip: string
    destinationCountry: string
    shipFromZip: string
-   lineItems: (LineItem[] | ILineItem[])
+   lineItems: (LineItem | ILineItem)[]
 }
 
 export class Level2Level3 implements ILevel2Level3 {
@@ -60,7 +60,7 @@ export class Level2Level3 implements ILevel2Level3 {
   /**
    * This is more detailed information about the items that are being purchased.
    */
-  lineItems: LineItem[] | ILineItem[]
+  lineItems: (LineItem | ILineItem)[]
 
   constructor(resp?: ILevel2Level3) {
     if (resp) {
