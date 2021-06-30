@@ -19,6 +19,7 @@ import { AuthorizationReversal } from './cardpayments/authorizationreversal'
 import { BillingDetails } from './cardpayments/billingDetails'
 import { Card, ICard } from './cardpayments/card'
 import { CardExpiry, ICardExpiry } from './cardpayments/cardExpiry'
+import { ILevel2Level3, Level2Level3 } from './cardpayments/level2Level3'
 import { MasterPass } from './cardpayments/masterPass'
 import { Pagination } from './cardpayments/pagination'
 import { Refund, RefundStatus } from './cardpayments/refund'
@@ -100,6 +101,7 @@ export {
   CardSingleUseToken, ICardSingleUseToken,
   ApplePaySingleUseToken, IApplePaySingleUseToken,
   ApplePayPaymentToken, IApplePayPaymentToken,
+  Level2Level3, ILevel2Level3,
 }
 
 export { PaysafeError as Error }
@@ -149,6 +151,7 @@ export class Paysafe {
   CardSingleUseToken = CardSingleUseToken
   ApplePaySingleUseToken = ApplePaySingleUseToken
   ApplePayPaymentToken = ApplePayPaymentToken
+  Level2Level3 = Level2Level3
   // authentication = require('./threedsecure/authentications')
 
   public merchantService: MerchantServiceHandler

@@ -6,6 +6,7 @@ import { AcquirerResponse } from './acquirerResponse'
 import { Authentication } from './authentication'
 import { BillingDetails, IBillingDetails } from './billingDetails'
 import { Card } from './card'
+import { ILevel2Level3, Level2Level3 } from './level2Level3'
 import { MasterPass } from './masterPass'
 import { Settlement } from './settlement'
 import { ShippingDetails } from './shippingDetails'
@@ -46,10 +47,14 @@ export interface IAuthorization extends IGenericLinkedObject {
   status?: AuthorizationStatus
   riskReasonCode?: number[]
   acquirerResponse?: AcquirerResponse
-  visaAdditionalAuthData?: VisaAdditionalAuthData
+  level2Level3?: (Level2Level3 | ILevel2Level3)
   auths?: (Authorization | IAuthorization)[]
   settlements?: Settlement[]
   splitpay?: (SplitPayout | ISplitPayout)[]
+  /**
+   * @deprecated
+   */
+  visaAdditionalAuthData?: VisaAdditionalAuthData
 }
 
 export class Authorization extends GenericLinkedObject implements IAuthorization {
@@ -83,10 +88,14 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
   status: AuthorizationStatus
   riskReasonCode: number[]
   acquirerResponse: AcquirerResponse
-  visaAdditionalAuthData?: VisaAdditionalAuthData
+  level2Level3?: Level2Level3 | ILevel2Level3
   auths: Authorization[]
   settlements: Settlement[]
   splitpay?: SplitPayout[] | ISplitPayout[]
+  /**
+   * @deprecated
+   */
+  visaAdditionalAuthData?: VisaAdditionalAuthData
 
   constructor(resp?: IAuthorization) {
     super(resp)
@@ -173,6 +182,9 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
       if (resp.acquirerResponse) {
         this.acquirerResponse = new AcquirerResponse(resp.acquirerResponse)
       }
+      if (resp.level2Level3) {
+        this.level2Level3 = new Level2Level3(resp.level2Level3)
+      }
       if (resp.visaAdditionalAuthData) {
         this.visaAdditionalAuthData = new VisaAdditionalAuthData(resp.visaAdditionalAuthData)
       }
@@ -234,6 +246,14 @@ export class Authorization extends GenericLinkedObject implements IAuthorization
 
   getAcquirerResponse() {
     return this.acquirerResponse
+  }
+
+  setLevel2Level3(level2Level3: (Level2Level3 | ILevel2Level3)) {
+    this.level2Level3 = new Level2Level3(level2Level3)
+  }
+
+  getLevel2Level3() {
+    return this.level2Level3
   }
 
   setRiskReasonCode(riskReasonCode: number[]) {

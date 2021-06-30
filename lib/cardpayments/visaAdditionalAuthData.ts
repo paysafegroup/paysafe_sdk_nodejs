@@ -1,5 +1,8 @@
 import { DateOfBirth } from '../customervault/dateofbirth'
 
+/**
+ * @deprecated
+ */
 export class VisaAdditionalAuthData {
   recipientDateOfBirth: DateOfBirth
   recipientZip: string
