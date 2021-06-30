@@ -64,31 +64,31 @@ export class Level2Level3 implements ILevel2Level3 {
 
   constructor(resp?: ILevel2Level3) {
     if (resp) {
-      if (resp.exemptLocalTax) {
+      if (resp.exemptLocalTax != null) {
         this.exemptLocalTax = resp.exemptLocalTax
       }
-      if (resp.localTaxAmount) {
+      if (resp.localTaxAmount != null) {
         this.localTaxAmount = resp.localTaxAmount
       }
-      if (resp.nationalTaxAmount) {
+      if (resp.nationalTaxAmount != null) {
         this.nationalTaxAmount = resp.nationalTaxAmount
       }
-      if (resp.freightAmount) {
+      if (resp.freightAmount != null) {
         this.freightAmount = resp.freightAmount
       }
-      if (resp.dutyAmount) {
+      if (resp.dutyAmount != null) {
         this.dutyAmount = resp.dutyAmount
       }
-      if (resp.destinationZip) {
+      if (resp.destinationZip != null) {
         this.destinationZip = resp.destinationZip
       }
-      if (resp.destinationCountry) {
+      if (resp.destinationCountry != null) {
         this.destinationCountry = resp.destinationCountry
       }
-      if (resp.shipFromZip) {
+      if (resp.shipFromZip != null) {
         this.shipFromZip = resp.shipFromZip
       }
-      if (resp.lineItems) {
+      if (resp.lineItems != null) {
         this.lineItems = resp.lineItems.map((lineItem) => new LineItem(lineItem))
       }
     }

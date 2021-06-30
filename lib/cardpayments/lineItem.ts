@@ -59,19 +59,19 @@ export class LineItem implements ILineItem {
       if (resp.productCode) {
         this.productCode = resp.productCode
       }
-      if (resp.quantity) {
+      if (resp.quantity != null) {
         this.quantity = resp.quantity
       }
-      if (resp.unitAmount) {
+      if (resp.unitAmount != null) {
         this.unitAmount = resp.unitAmount
       }
-      if (resp.taxRate) {
+      if (resp.taxRate != null) {
         this.taxRate = resp.taxRate
       }
-      if (resp.taxAmount) {
+      if (resp.taxAmount != null) {
         this.taxAmount = resp.taxAmount
       }
-      if (resp.totalAmount) {
+      if (resp.totalAmount != null) {
         this.totalAmount = resp.totalAmount
       }
     }
